@@ -1,0 +1,8 @@
+.left-content-box {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 15px;
+  width: var(--content-box-widths);
+  border-radius: var(--box-radius);
+}
