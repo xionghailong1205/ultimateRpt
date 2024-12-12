@@ -10,4 +10,14 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://hymc.mypacs.cn:665/",
+        rewrite: (path) => {
+          return path.replace(/^\/api/, "");
+        },
+      },
+    },
+  },
 });
