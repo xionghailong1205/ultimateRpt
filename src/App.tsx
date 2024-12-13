@@ -4,12 +4,16 @@ import { HomePage } from "./View/HomePage";
 import { useEffect } from "react";
 import { PatientManagement } from "./api/PatientManagement";
 import { Auth } from "./api/Auth";
+import { getAuthorizationCookie } from "./store/useAuth";
+import RouterNeedAuth from "./View/Router/RouterNeedAuth";
 
 function App() {
   useEffect(() => {
-    Auth.Login().then(() => {
-      PatientManagement.getPatientList()
-    })
+    // Auth.Login().then(() => {
+    //   PatientManagement.getPatientList()
+    // })
+
+    // getAuthorizationCookie()
   }, [])
 
   return (
@@ -18,7 +22,11 @@ function App() {
         <Route path="/" element={<Login />}>
         </Route>
         <Route path="/home">
-          <Route index element={<HomePage />} />
+          <Route index element={
+            <RouterNeedAuth>
+              <HomePage />
+            </RouterNeedAuth>
+          } />
         </Route>
       </Routes>
     </BrowserRouter>
