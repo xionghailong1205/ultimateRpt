@@ -12,10 +12,16 @@ import DialogTriggerButton from "./DialogTriggerButton"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import CustomCalendar from "./CustomCalendar"
-import { ReactNode } from "react"
-import { DivProp } from "@/View/Content/component/type"
+import { ReactNode, useEffect } from "react"
+import { DivProp } from "@/View/type"
+import { PatientManagement } from "@/api/PatientManagement"
 
 const RetrievePatientDialog = () => {
+    // 简单的 fetch 数据
+    useEffect(() => {
+        PatientManagement.getPatientList()
+    }, [])
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -42,13 +48,6 @@ const RetrievePatientDialog = () => {
                 <div>
                     <Form />
                 </div>
-                <DialogFooter className="sm:justify-start">
-                    <DialogClose asChild>
-                        {/* <Button type="button" variant="secondary">
-                            Close
-                        </Button> */}
-                    </DialogClose>
-                </DialogFooter>
             </DialogContent>
         </Dialog>
     )
@@ -139,7 +138,6 @@ const Form = () => {
     )
 }
 
-
 type InputType = "text" | "date"
 interface InputProp {
     type: InputType;
@@ -158,6 +156,10 @@ const CustomInput = ({
         return (
             <Input
                 type="text" placeholder="请输入..."
+                style={{
+                    fontSize: "12px",
+                }}
+                className="px-2 h-[30px] focus-visible:ring-1 ring-[#2da5b4]"
             />
         )
     }
@@ -170,7 +172,9 @@ const CustomInput = ({
         case "date": {
             SpecifiedInput = () => {
                 return (
-                    <CustomCalendar />
+                    <CustomCalendar
+
+                    />
                 )
             }
             break
@@ -190,8 +194,8 @@ const CustomInput = ({
         >
             <Label
                 style={{
-                    fontSize: "14px",
-                    flex: 1
+                    flex: 1,
+                    color: "#2da5b4"
                 }}
             >
                 {label}
@@ -224,6 +228,14 @@ const Row = ({
             }}
         >
             {children}
+        </div>
+    )
+}
+
+const Table = ({ ...prop }: DivProp) => {
+    return (
+        <div>
+            Table
         </div>
     )
 }

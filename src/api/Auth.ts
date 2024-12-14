@@ -2,16 +2,21 @@ import config from "./config";
 
 const baseURL = config.apiBaseUrl;
 
+export interface AccountInfo {
+  username: string;
+  password: string;
+}
+
 export namespace Auth {
-  export const Login = async () => {
+  export const Login = async ({ username, password }: AccountInfo) => {
     let headersList = {
       Accept: "*/*",
       "Content-Type": "application/json",
     };
 
     let bodyContent = JSON.stringify({
-      username: "admin",
-      password: "e64b78fc3bc91bcbc7dc232ba8ec59e0",
+      username,
+      password,
     });
 
     let response = await fetch(`${baseURL}/user/login`, {
@@ -20,7 +25,8 @@ export namespace Auth {
       headers: headersList,
     });
 
-    let data = await response.json();
-    console.log(data);
+    let result = await response.json();
+
+    return result;
   };
 }

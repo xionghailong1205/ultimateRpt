@@ -17,7 +17,7 @@ const CustomCalendar = () => {
                 <Button
                     variant={"outline"}
                     className={cn(
-                        "pl-3 text-left font-normal w-full",
+                        "pl-3 text-left font-normal w-full text-[12px] h-[30px] focus-visible:ring-[#2da5b4]",
                         !date && "text-muted-foreground"
                     )}
                 >

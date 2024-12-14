@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff } from "lucide-react"
-import { DivProp, InputProp } from "../HomePage/Content/component/type"
+import { InputProp } from "../HomePage/Content/component/type"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/store/useAuth"
@@ -25,19 +25,28 @@ const Login = () => {
     // 添加简单的登陆验证
     const form = useForm({
         defaultValues: {
-            account: '',
-            passWord: ''
+            username: '',
+            password: ''
         },
         onSubmit: async ({ value }) => {
-            console.log(value)
+            const { username, password } = value
 
-            const result = await new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    resolve("登录成功")
-                }, 1000)
+            const loginResult = await useAuth.getState().logIn({
+                username,
+                password
             })
 
-            console.log(result)
+
+            // 处理 loginResult
+            if (loginResult.code === 500) {
+                setLoginResult(loginResult.msg)
+            }
+
+            console.log(loginResult)
+
+            if (loginResult.code === 200) {
+                navigate('/home')
+            }
         }
     })
 
@@ -78,7 +87,7 @@ const Login = () => {
                         超声系统
                     </div>
                     <form.Field
-                        name="account"
+                        name='username'
                         validators={{
                             onChange: ({ value }) =>
                                 !value
@@ -112,7 +121,7 @@ const Login = () => {
                         }}
                     />
                     <form.Field
-                        name="passWord"
+                        name='password'
                         validators={{
                             onChange: ({ value }) =>
                                 !value
@@ -144,7 +153,13 @@ const Login = () => {
                     />
                     {
                         loginResult ? (
-                            <div>
+                            <div
+                                style={{
+                                    width: "80%",
+                                    marginBottom: "-20px",
+                                    color: "red"
+                                }}
+                            >
                                 {loginResult}
                             </div>
                         ) : ""
