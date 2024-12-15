@@ -37,6 +37,12 @@ const EntryPatientDialog = () => {
                         event.preventDefault()
                     }
                 }
+
+                onOpenAutoFocus={
+                    (event) => {
+                        event.preventDefault()
+                    }
+                }
             >
                 <DialogHeader>
                     <DialogTitle>录入病人</DialogTitle>

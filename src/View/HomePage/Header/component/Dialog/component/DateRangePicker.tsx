@@ -54,7 +54,7 @@ export function DatePickerWithRange({
                 })
               )
             ) : (
-              <span>Pick a date</span>
+              <span>选择时间范围:</span>
             )}
           </Button>
         </PopoverTrigger>

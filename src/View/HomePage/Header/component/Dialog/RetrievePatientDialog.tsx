@@ -46,6 +46,12 @@ const RetrievePatientDialog = () => {
                         event.preventDefault()
                     }
                 }
+
+                onOpenAutoFocus={
+                    (event) => {
+                        event.preventDefault()
+                    }
+                }
             >
                 <DialogHeader>
                     <DialogTitle>检索病人</DialogTitle>
@@ -237,6 +243,14 @@ const ResultTable = ({ ...prop }: TableProp) => {
         return (
             <div
                 {...prop}
+                style={{
+                    border: "1px solid #c6babaa8",
+                    borderRadius: "10px",
+                    // height: "200px",
+                    // overflow: "auto",
+                    ...prop.style
+                }}
+                className="result-table"
             >
                 <Table>
                     <TableHeader>
@@ -282,7 +296,7 @@ const ResultTable = ({ ...prop }: TableProp) => {
             <div
                 {...prop}
                 style={{
-                    height: "240px",
+                    height: "250px",
                     border: "1px solid #c6babaa8",
                     borderRadius: "10px",
                     ...prop.style
