@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button'
 import RetrievePatientDialog from './RetrievePatientDialog'
-import UserManagement from './UserManagement'
+import EntryPatientDialog from './Dialog/EntryPatientDialog'
+
+// import UserManagement from './UserManagement'
 
 const DialogTriggerList = () => {
     return (
@@ -31,12 +33,13 @@ const DialogTriggerList = () => {
                     alert("实现模板管理Modal")
                 }}
             />
-            <NavButton
+            {/* <NavButton
                 buttonName='录入病人'
                 callback={() => {
                     alert("实现录入病人Modal")
                 }}
-            />
+            /> */}
+            <EntryPatientDialog />
             <NavButton
                 buttonName='报告打印'
                 callback={() => {

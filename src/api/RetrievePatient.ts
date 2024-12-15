@@ -24,14 +24,27 @@ export interface PatientInfo {
   updateTime: string;
 }
 
-export namespace PatientManagement {
-  export const getPatientList = async (): Promise<Array<PatientInfo>> => {
+interface PropOfFetchPatientListOfPage {
+  pageNumber: number;
+  pageSize: number;
+}
+
+interface FetchPatientListOfPageResult {
+  totalCount: number;
+  patientList: Array<PatientInfo>;
+}
+
+export namespace RetrievePatient {
+  export const getPatientListOfPage = async ({
+    pageNumber,
+    pageSize,
+  }: PropOfFetchPatientListOfPage): Promise<FetchPatientListOfPageResult> => {
     let headersList = {
       Accept: "*/*",
     };
 
     let response = await fetch(
-      `${baseURL}/exam/person/page?pageSize=10&pageNum=1`,
+      `${baseURL}/exam/person/page?pageSize=${pageSize}&pageNum=${pageNumber}`,
       {
         method: "GET",
         headers: headersList,
@@ -42,9 +55,15 @@ export namespace PatientManagement {
     console.log(requestResult);
 
     if (requestResult.code !== 200) {
-      return [];
+      return {
+        totalCount: 0,
+        patientList: [],
+      };
     }
 
-    return requestResult.rows;
+    return {
+      totalCount: requestResult.total,
+      patientList: requestResult.rows,
+    };
   };
 }

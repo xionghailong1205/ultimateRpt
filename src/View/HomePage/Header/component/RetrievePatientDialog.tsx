@@ -1,27 +1,31 @@
 import {
     Dialog,
-    DialogClose,
     DialogContent,
-    DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+
 import DialogTriggerButton from "./DialogTriggerButton"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import CustomCalendar from "./CustomCalendar"
-import { ReactNode, useEffect } from "react"
-import { DivProp } from "@/View/type"
-import { PatientManagement } from "@/api/PatientManagement"
+import { ReactNode, useEffect, useMemo } from "react"
+import { DivProp, TableProp } from "@/View/type"
+import { PatientProvider, usePatientService } from "@/service/PatientService"
+import { PaginationWithLinks } from "@/components/ui/pagination-with-links"
+import { Spinner } from "@/components/ui/spinner"
 
 const RetrievePatientDialog = () => {
-    // 简单的 fetch 数据
-    useEffect(() => {
-        PatientManagement.getPatientList()
-    }, [])
-
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -33,7 +37,9 @@ const RetrievePatientDialog = () => {
             </DialogTrigger>
             <DialogContent
                 style={{
-                    maxWidth: "1000px"
+                    width: "1000px",
+                    maxWidth: "1000px",
+                    minWidth: "1000px"
                 }}
 
                 onPointerDownOutside={
@@ -45,17 +51,45 @@ const RetrievePatientDialog = () => {
                 <DialogHeader>
                     <DialogTitle>检索病人</DialogTitle>
                 </DialogHeader>
-                <div>
-                    <Form />
-                </div>
+                <PatientProvider>
+                    <PatientTable />
+                </PatientProvider>
             </DialogContent>
         </Dialog>
     )
 }
 
-const Form = () => {
+const PatientTable = () => {
+    const {
+        fetchPatientInfoList
+    } = usePatientService()
+
+    useEffect(() => {
+        fetchPatientInfoList()
+    }, [])
+
     return (
-        <>
+        <div>
+            <QueryForm />
+            <ResultTable
+                style={{
+                    width: "950px",
+                    overflow: "hidden",
+                    margin: "10px auto",
+                }}
+            />
+            <Pagination />
+        </div>
+    )
+}
+
+const QueryForm = () => {
+    return (
+        <div style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px"
+        }}>
             <Row
                 style={{
                     gap: "20px"
@@ -134,7 +168,26 @@ const Form = () => {
                     inputWidth={80}
                 />
             </Row>
-        </>
+        </div>
+    )
+}
+
+const Pagination = () => {
+    const {
+        currentPage,
+        totalCount,
+        pageSize
+    } = usePatientService()
+
+    return (
+        <PaginationWithLinks
+            pageSizeSelectOptions={{
+                pageSizeOptions: [5, 10, 20, 25]
+            }}
+            pageSize={pageSize}
+            page={currentPage}
+            totalCount={totalCount}
+        />
     )
 }
 
@@ -172,9 +225,7 @@ const CustomInput = ({
         case "date": {
             SpecifiedInput = () => {
                 return (
-                    <CustomCalendar
-
-                    />
+                    <CustomCalendar />
                 )
             }
             break
@@ -232,12 +283,83 @@ const Row = ({
     )
 }
 
-const Table = ({ ...prop }: DivProp) => {
-    return (
-        <div>
-            Table
-        </div>
-    )
+const ResultTable = ({ ...prop }: TableProp) => {
+    // 我们之后在这里做一个 Map
+    // const key2labelMap = [
+    //     [],
+    // ]
+
+    const {
+        patientInfoList
+    } = usePatientService()
+
+    console.log(patientInfoList)
+
+    let keyList: Array<string> = []
+
+    if (patientInfoList.length > 0) {
+        // 之后在做如果没有的情况
+        keyList = Object.keys(patientInfoList[0])
+
+        return (
+            <div
+                {...prop}
+            >
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            {
+                                keyList.map((headerName) => {
+                                    return (
+                                        <TableHead className="w-[100px]">{headerName}</TableHead>
+                                    )
+                                })
+                            }
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {patientInfoList.map((patientInfo) => (
+                            <TableRow
+                                key={patientInfo.id}
+                            >
+                                {
+                                    keyList.map(key => {
+                                        return (
+                                            <TableCell
+                                                style={{
+                                                    whiteSpace: "nowrap"
+                                                }}
+                                            >
+                                                {
+                                                    // @ts-ignore
+                                                    patientInfo[key]
+                                                }
+                                            </TableCell>
+                                        )
+                                    })
+                                }
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+        )
+    } else {
+        return (
+            <div
+                {...prop}
+                style={{
+                    height: "240px",
+                    border: "1px solid #c6babaa8",
+                    borderRadius: "10px",
+                    ...prop.style
+                }}
+                className="center"
+            >
+                <Spinner className="stroke-[var(--theme-fore-color)]" />
+            </div>
+        )
+    }
 }
 
 export default RetrievePatientDialog

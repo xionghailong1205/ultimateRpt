@@ -32,6 +32,10 @@
     --content-box-width: 210px;
     --box-radius: 10px;
     --bodypart-box-height: 650px;
+    /* 配合 tailwind 用的 css 变量 */
+    --table-row-height: 40px;
+    /* 主题前景色 */
+    --theme-fore-color: #2da5b4;
   }
 
   .dark {
@@ -104,7 +108,6 @@ input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
 
 /* input:-internal-autofill-selected {
   appearance: menulist-button;
