@@ -15,15 +15,14 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-import DialogTriggerButton from "./DialogTriggerButton"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import CustomCalendar from "./CustomCalendar"
-import { ReactNode, useEffect, useMemo } from "react"
+import DialogTriggerButton from "./component/DialogTriggerButton"
+import { ReactNode, useEffect } from "react"
 import { DivProp, TableProp } from "@/View/type"
 import { PatientProvider, usePatientService } from "@/service/PatientService"
 import { PaginationWithLinks } from "@/components/ui/pagination-with-links"
 import { Spinner } from "@/components/ui/spinner"
+import { CustomInput, CustomInputCell } from "./component/CustomInput"
+import CustomCalendar from "./component/CustomCalendar"
 
 const RetrievePatientDialog = () => {
     return (
@@ -74,7 +73,6 @@ const PatientTable = () => {
             <ResultTable
                 style={{
                     width: "950px",
-                    overflow: "hidden",
                     margin: "10px auto",
                 }}
             />
@@ -95,78 +93,88 @@ const QueryForm = () => {
                     gap: "20px"
                 }}
             >
-                <CustomInput
+                <CustomInputCell
                     label="体检人员ID:"
-                    type="text"
                     containerWidth={210}
                     inputWidth={120}
-                />
-                <CustomInput
+                >
+                    <CustomInput />
+                </CustomInputCell>
+                <CustomInputCell
                     label="人员姓名:"
-                    type="text"
-                    containerWidth={200}
+                    containerWidth={210}
                     inputWidth={120}
-                />
-                <CustomInput
+                >
+                    <CustomInput />
+                </CustomInputCell>
+                <CustomInputCell
                     label="体检编号:"
-                    type="text"
-                    containerWidth={200}
+                    containerWidth={210}
                     inputWidth={120}
-                />
-                <CustomInput
+                >
+                    <CustomInput />
+                </CustomInputCell>
+                <CustomInputCell
                     label="体检日期:"
-                    type="date"
-                    containerWidth={240}
-                    inputWidth={160}
-                />
+                    containerWidth={210}
+                    inputWidth={140}
+                >
+                    <CustomCalendar />
+                </CustomInputCell>
             </Row>
             <Row
                 style={{
                     gap: "20px"
                 }}
             >
-                <CustomInput
+                <CustomInputCell
                     label="版本:"
-                    type="text"
                     containerWidth={130}
                     inputWidth={80}
-                />
-                <CustomInput
+                >
+                    <CustomInput />
+                </CustomInputCell>
+                <CustomInputCell
                     label="单位社会信用代码:"
-                    type="text"
                     containerWidth={250}
                     inputWidth={120}
-                />
-                <CustomInput
+                >
+                    <CustomInput />
+                </CustomInputCell>
+                <CustomInputCell
                     label="单位名称:"
-                    type="text"
                     containerWidth={200}
                     inputWidth={120}
-                />
-                <CustomInput
+                >
+                    <CustomInput />
+                </CustomInputCell>
+                <CustomInputCell
                     label="性别:"
-                    type="text"
                     containerWidth={130}
                     inputWidth={90}
-                />
+                >
+                    <CustomInput />
+                </CustomInputCell>
             </Row>
             <Row
                 style={{
                     gap: "20px"
                 }}
             >
-                <CustomInput
+                <CustomInputCell
                     label="生日:"
-                    type="text"
-                    containerWidth={130}
-                    inputWidth={80}
-                />
-                <CustomInput
+                    containerWidth={190}
+                    inputWidth={150}
+                >
+                    <CustomCalendar />
+                </CustomInputCell>
+                <CustomInputCell
                     label="年龄:"
-                    type="text"
                     containerWidth={130}
                     inputWidth={80}
-                />
+                >
+                    <CustomInput />
+                </CustomInputCell>
             </Row>
         </div>
     )
@@ -188,77 +196,6 @@ const Pagination = () => {
             page={currentPage}
             totalCount={totalCount}
         />
-    )
-}
-
-type InputType = "text" | "date"
-interface InputProp {
-    type: InputType;
-    label: string;
-    containerWidth: number;
-    inputWidth: number;
-}
-
-const CustomInput = ({
-    label,
-    type,
-    containerWidth,
-    inputWidth
-}: InputProp) => {
-    let SpecifiedInput = () => {
-        return (
-            <Input
-                type="text" placeholder="请输入..."
-                style={{
-                    fontSize: "12px",
-                }}
-                className="px-2 h-[30px] focus-visible:ring-1 ring-[#2da5b4]"
-            />
-        )
-    }
-
-    switch (type) {
-        case "text": {
-            // do nothing here
-            break
-        }
-        case "date": {
-            SpecifiedInput = () => {
-                return (
-                    <CustomCalendar />
-                )
-            }
-            break
-        }
-        default: {
-
-        }
-    }
-
-    return (
-        <div
-            style={{
-                display: "flex",
-                alignItems: "center",
-                width: `${containerWidth}px`,
-            }}
-        >
-            <Label
-                style={{
-                    flex: 1,
-                    color: "#2da5b4"
-                }}
-            >
-                {label}
-            </Label>
-            <div
-                style={{
-                    width: `${inputWidth}px`
-                }}
-            >
-                <SpecifiedInput />
-            </div>
-        </div>
     )
 }
 
@@ -284,10 +221,6 @@ const Row = ({
 }
 
 const ResultTable = ({ ...prop }: TableProp) => {
-    // 我们之后在这里做一个 Map
-    // const key2labelMap = [
-    //     [],
-    // ]
 
     const {
         patientInfoList
@@ -311,7 +244,7 @@ const ResultTable = ({ ...prop }: TableProp) => {
                             {
                                 keyList.map((headerName) => {
                                     return (
-                                        <TableHead className="w-[100px]">{headerName}</TableHead>
+                                        <TableHead>{headerName}</TableHead>
                                     )
                                 })
                             }

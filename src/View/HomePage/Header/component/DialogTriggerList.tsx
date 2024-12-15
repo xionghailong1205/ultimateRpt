@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import RetrievePatientDialog from './RetrievePatientDialog'
+import RetrievePatientDialog from './Dialog/RetrievePatientDialog'
 import EntryPatientDialog from './Dialog/EntryPatientDialog'
 
 // import UserManagement from './UserManagement'

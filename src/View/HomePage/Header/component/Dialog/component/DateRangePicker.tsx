@@ -1,7 +1,6 @@
 import * as React from "react"
-import { addDays, format } from "date-fns"
+import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
-import { DateRange } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -12,16 +11,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { zhCN } from "date-fns/locale"
-import { DateRangeOfQuery, useEntryPatientService } from "@/service/EntryPatientService"
+import { DateRangeOfQuery } from "@/service/EntryPatientService"
 
 interface DatePickerWithRangeProp extends React.HTMLAttributes<HTMLDivElement> {
-  dateRange: DateRangeOfQuery,
-  setDateRange: Function,
+  value: DateRangeOfQuery,
+  updateData: Function,
 }
 
 export function DatePickerWithRange({
-  dateRange,
-  setDateRange,
+  value,
+  updateData,
   className,
   ...prop
 }: DatePickerWithRangeProp) {
@@ -33,24 +32,26 @@ export function DatePickerWithRange({
             id="date"
             variant={"outline"}
             className={cn(
-              "text-[12px] h-[30px] w-[250px] justify-start text-left font-normal",
-              !dateRange && "text-muted-foreground",
+              "text-[12px] w-full h-[30px] justify-start text-left font-normal",
+              !value && "text-muted-foreground",
               className
             )}
           >
             <CalendarIcon />
-            {dateRange?.from ? (
-              dateRange.to ? (
+            {value?.from ? (
+              value.to ? (
                 <>
-                  {format(dateRange.from, "PPP", {
+                  {format(value.from, "PPP", {
                     locale: zhCN
                   })} -{" "}
-                  {format(dateRange.to, "PPP", {
+                  {format(value.to, "PPP", {
                     locale: zhCN
                   })}
                 </>
               ) : (
-                format(dateRange.from, "LLL dd, y")
+                format(value.from, "PPP", {
+                  locale: zhCN
+                })
               )
             ) : (
               <span>Pick a date</span>
@@ -61,9 +62,8 @@ export function DatePickerWithRange({
           <Calendar
             initialFocus
             mode="range"
-            defaultMonth={dateRange?.from}
-            selected={dateRange}
-            onSelect={setDateRange}
+            selected={value}
+            onSelect={updateData}
             onDayBlur={prop.onBlur}
             numberOfMonths={2}
           />

@@ -5,11 +5,14 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import DialogTriggerButton from "../DialogTriggerButton"
+import DialogTriggerButton from "./component/DialogTriggerButton"
 import { DatePickerWithRange } from "./component/DateRangePicker"
 import { DateRangeOfQuery, EntryPatientProvider, useEntryPatientService } from "@/service/EntryPatientService"
-import { useForm } from "@tanstack/react-form"
 import clsx from "clsx"
+import { Button } from "@/components/ui/button"
+import { DivProp } from "@/View/type"
+import { ReactNode } from "react"
+import { CustomInputCell } from "./component/CustomInput"
 
 
 const EntryPatientDialog = () => {
@@ -71,39 +74,86 @@ const EntryPatientTable = () => {
                 form.handleSubmit()
             }}
         >
-            <form.Field
-                name='dateRange'
-                validators={{
-                    onChange: ({ value }) =>
-                        !validateSelectDateRange(value)
-                            ? '请选择日期'
-                            : undefined
-                }}
-                children={(field) => {
-                    const fieldEmpty = field.state.meta.errors.length > 0
+            <Row>
+                <form.Field
+                    name='dateRange'
+                    validators={{
+                        onChange: ({ value }) =>
+                            !validateSelectDateRange(value)
+                                ? '请选择日期'
+                                : undefined
+                    }}
+                    children={(field) => {
+                        const fieldEmpty = field.state.meta.errors.length > 0
 
-                    const className = clsx({
-                        'border-red-700': fieldEmpty,
-                        // "placeholder:text-red-800": fieldEmpty
-                    })
+                        const className = clsx({
+                            'border-red-700': fieldEmpty,
+                        })
 
-                    console.log(className)
-                    return (
-                        <>
-                            <DatePickerWithRange
-                                dateRange={field.state.value}
-                                setDateRange={(value: DateRangeOfQuery) => {
-                                    console.log(value)
-                                    field.handleChange(value)
-                                }}
-                                onBlur={field.handleBlur}
-                                className={className}
-                            />
-                        </>
-                    )
+                        return (
+                            <CustomInputCell
+                                label="起始时间 - 结束时间："
+                                containerWidth={400}
+                                inputWidth={250}
+                            >
+                                <DatePickerWithRange
+                                    value={field.state.value}
+                                    updateData={(value: DateRangeOfQuery) => {
+                                        field.handleChange(value)
+                                    }}
+                                    onBlur={field.handleBlur}
+                                    className={className}
+                                />
+                            </CustomInputCell>
+                        )
+                    }}
+                />
+            </Row>
+            {/* 最后一行 */}
+            <Row
+                style={{
+                    display: "flex",
+                    justifyContent: "space-between"
                 }}
-            />
+            >
+                <div>
+                    之后增加 Input
+                </div>
+                <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <Button
+                            type="submit"
+                            disabled={!canSubmit}
+                            className="h-[--queryForm-row-height] bg-[--theme-fore-color] hover:bg-[--theme-fore-color-hover]"
+                        >
+                            {isSubmitting ? '查询中' : '查询'}
+                        </Button>
+                    )}
+                />
+            </Row>
         </form>
+    )
+}
+
+interface RowProp extends DivProp {
+    children: Array<ReactNode>
+}
+
+const Row = ({
+    children,
+    ...prop
+}: RowProp) => {
+    return (
+        <div
+            {...prop}
+            style={{
+                display: "flex",
+                ...prop.style
+            }}
+        >
+            {children}
+        </div>
     )
 }
 

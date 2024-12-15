@@ -36,6 +36,9 @@
     --table-row-height: 40px;
     /* 主题前景色 */
     --theme-fore-color: #2da5b4;
+    --theme-fore-color-hover: #2da4b4ce;
+    /* queryForm row height */
+    --queryForm-row-height: 30px
   }
 
   .dark {
@@ -118,4 +121,11 @@ input[type="number"]::-webkit-inner-spin-button {
 
 input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0 30px white inset !important;
+}
+
+*:focus-visible {
+  /* border: none;
+  outline: none; */
+  /* -webkit-box-shadow: 0 0 0 30px white inset !important; */
+  outline: none !important;
 }
