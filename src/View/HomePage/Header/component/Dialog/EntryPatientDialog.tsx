@@ -80,6 +80,10 @@ const EntryPatientTable = () => {
             <ResultTable
                 rowDataList={patientList}
                 keyField="personName"
+                style={{
+                    width: "950px",
+                    margin: "10px auto",
+                }}
             />
         </div>
     )
@@ -161,7 +165,11 @@ const QueryForm = () => {
                     justifyContent: "space-between"
                 }}
             >
-                <div>
+                <div
+                    style={{
+                        visibility: "hidden"
+                    }}
+                >
                     之后增加 Input
                 </div>
                 <form.Subscribe
@@ -170,7 +178,7 @@ const QueryForm = () => {
                         <Button
                             type="submit"
                             disabled={!canSubmit}
-                            className="h-[--queryForm-row-height] bg-[--theme-fore-color] hover:bg-[--theme-fore-color-hover]"
+                            className="h-[---row-height] bg-[--theme-fore-color] hover:bg-[--theme-fore-color-hover]"
                         >
                             {isSubmitting ? '查询中' : '查询'}
                         </Button>

@@ -35,8 +35,8 @@ export const ResultTable = ({
                 style={{
                     border: "1px solid #c6babaa8",
                     borderRadius: "10px",
-                    // height: "200px",
-                    // overflow: "auto",
+                    height: "250px",
+                    overflow: "auto",
                     ...prop.style
                 }}
                 className="result-table"
@@ -68,7 +68,7 @@ export const ResultTable = ({
                                             >
                                                 {
                                                     // @ts-ignore
-                                                    patientInfo[key]
+                                                    rowData[key]
                                                 }
                                             </TableCell>
                                         )

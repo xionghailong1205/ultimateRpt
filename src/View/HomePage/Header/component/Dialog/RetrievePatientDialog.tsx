@@ -80,6 +80,8 @@ const PatientTable = () => {
                 style={{
                     width: "950px",
                     margin: "10px auto",
+                    height: "250px",
+                    overflow: "auto",
                 }}
             />
             <Pagination />

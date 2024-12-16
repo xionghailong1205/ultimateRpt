@@ -31,14 +31,8 @@ export const PatientProvider = ({ children }: {
                 totalCount
             } = requestResult
 
-            // for test
-            setTimeout(() => {
-                setPatientInfoList(patientList)
-                setTotalCount(totalCount)
-            }, 1000)
-
-            // setPatientInfoList(patientList)
-            // setTotalCount(totalCount)
+            setPatientInfoList(patientList)
+            setTotalCount(totalCount)
         })
     }
 
