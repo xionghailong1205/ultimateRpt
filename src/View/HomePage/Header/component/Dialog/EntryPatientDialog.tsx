@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { DivProp } from "@/View/type"
 import { ReactNode } from "react"
 import { CustomInputCell } from "./component/CustomInput"
-
+import { ResultTable } from "./component/ResultTable"
 
 const EntryPatientDialog = () => {
     return (
@@ -69,7 +69,46 @@ const validateSelectDateRange = (dateRange: DateRangeOfQuery) => {
 }
 
 const EntryPatientTable = () => {
+    const {
+        patientList
+    } = useEntryPatientService()
+
     // 添加简单的登陆验证
+    return (
+        <div>
+            <QueryForm />
+            <ResultTable
+                rowDataList={patientList}
+                keyField="personName"
+            />
+        </div>
+    )
+}
+
+// 我们在这个位置添加 Table 我们对现有的 Table 进行封装
+
+interface RowProp extends DivProp {
+    children: Array<ReactNode>
+}
+
+const Row = ({
+    children,
+    ...prop
+}: RowProp) => {
+    return (
+        <div
+            {...prop}
+            style={{
+                display: "flex",
+                ...prop.style
+            }}
+        >
+            {children}
+        </div>
+    )
+}
+
+const QueryForm = () => {
     const { form } = useEntryPatientService()
 
     return (
@@ -141,28 +180,5 @@ const EntryPatientTable = () => {
         </form>
     )
 }
-
-interface RowProp extends DivProp {
-    children: Array<ReactNode>
-}
-
-const Row = ({
-    children,
-    ...prop
-}: RowProp) => {
-    return (
-        <div
-            {...prop}
-            style={{
-                display: "flex",
-                ...prop.style
-            }}
-        >
-            {children}
-        </div>
-    )
-}
-
-
 
 export default EntryPatientDialog
