@@ -73,7 +73,7 @@ export const ResultTable = ({
                     style={{
                         border: "1px solid #c6babaa8",
                         borderRadius: "10px",
-                        height: "252px",
+                        height: "250px",
                         overflow: "auto",
                         width: "950px",
                         margin: "10px auto",
@@ -122,26 +122,6 @@ export const ResultTable = ({
             )
         }
     }
-
-    // if (rowDataList.length > 0) {
-    //     // 之后在做如果没有的情况
-    //     keyList = Object.keys(rowDataList[0])
-    // } else {
-    //     return (
-    //         <div
-    //             {...prop}
-    //             style={{
-    //                 height: "252px",
-    //                 border: "1px solid #c6babaa8",
-    //                 borderRadius: "10px",
-    //                 ...prop.style
-    //             }}
-    //             className="center"
-    //         >
-    //             <Spinner className="stroke-[var(--theme-fore-color)]" />
-    //         </div>
-    //     )
-    // }
 }
 
 const ResultTableContainer = ({
@@ -152,7 +132,7 @@ const ResultTableContainer = ({
     return (
         <div
             style={{
-                height: "252px",
+                height: "250px",
                 // border: "1px solid",
                 borderRadius: "10px",
                 width: "950px",
