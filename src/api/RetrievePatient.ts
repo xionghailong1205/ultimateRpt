@@ -1,5 +1,6 @@
 import config from "./config";
 import Cookies from "js-cookie";
+import { handleAuthenticationFailure } from "./utils/handleAuthenticationFailure";
 
 const baseURL = config.apiBaseUrl;
 
@@ -31,6 +32,7 @@ interface PropOfFetchPatientListOfPage {
 }
 
 interface FetchPatientListOfPageResult {
+  code: number;
   totalCount: number;
   patientList: Array<PatientInfo>;
 }
@@ -55,20 +57,8 @@ export namespace RetrievePatient {
     let requestResult = await response.json();
     console.log(requestResult);
 
-    if (requestResult.code === 401) {
-      Cookies.remove("Authorization");
-      // @ts-ignore
-      window.navigation.reload();
-    }
-
-    if (requestResult.code !== 200) {
-      return {
-        totalCount: 0,
-        patientList: [],
-      };
-    }
-
     return {
+      code: requestResult.code,
       totalCount: requestResult.total,
       patientList: requestResult.rows,
     };

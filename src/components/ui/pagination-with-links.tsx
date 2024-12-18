@@ -19,7 +19,7 @@ import {
 } from './select'
 // import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { usePatientService } from '@/service/PatientService';
+import { useRetrievePatientService } from '@/service/PatientService';
 
 export interface PaginationWithLinksProps {
   pageSizeSelectOptions?: {
@@ -29,6 +29,8 @@ export interface PaginationWithLinksProps {
   totalCount: number;
   pageSize: number;
   page: number;
+  navToPage: Function;
+  navToPageSize: Function;
 }
 
 /**
@@ -48,14 +50,10 @@ export function PaginationWithLinks({
   pageSize,
   totalCount,
   page,
+  navToPage,
+  navToPageSize
 }: PaginationWithLinksProps) {
-  const {
-    navToPage
-  } = usePatientService()
-
   const totalPageCount = Math.ceil(totalCount / pageSize);
-
-
 
   const navigateToPage = (newPage: number) => {
     // alert(`加载${newPage}页的数据}`)
@@ -73,8 +71,9 @@ export function PaginationWithLinks({
   //   [searchParams, pathname]
   // );
 
-  const navToPageSize = (newPageSize: number) => {
+  const navigateToPageSize = (newPageSize: number) => {
     // alert(`更新页数为${newPageSize}`)
+    navToPage(newPageSize)
   }
 
   const renderPageNumbers = () => {
@@ -150,7 +149,7 @@ export function PaginationWithLinks({
         <div className='flex flex-col gap-4 flex-1'>
           <SelectRowsPerPage
             options={pageSizeSelectOptions.pageSizeOptions}
-            setPageSize={navToPageSize}
+            setPageSize={navigateToPageSize}
             pageSize={pageSize}
           />
         </div>
@@ -202,6 +201,8 @@ function SelectRowsPerPage({
       <Select
         value={String(pageSize)}
         onValueChange={(value) => setPageSize(Number(value))}
+        // TODO: 我们之后需要完成
+        disabled
       >
         <SelectTrigger>
           <SelectValue placeholder='Select page size'>

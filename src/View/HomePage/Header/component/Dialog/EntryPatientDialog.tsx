@@ -14,6 +14,7 @@ import { DivProp } from "@/View/type"
 import { ReactNode } from "react"
 import { CustomInputCell } from "./component/CustomInput"
 import { ResultTable } from "./component/ResultTable"
+import Pagination from "./component/Pagination"
 
 const EntryPatientDialog = () => {
     return (
@@ -70,7 +71,13 @@ const validateSelectDateRange = (dateRange: DateRangeOfQuery) => {
 
 const EntryPatientTable = () => {
     const {
-        patientList
+        currentPageData,
+        resultTableState,
+        pageSize,
+        currentPage,
+        totalCount,
+        navToPage,
+        navToPageSize
     } = useEntryPatientService()
 
     // 添加简单的登陆验证
@@ -78,12 +85,16 @@ const EntryPatientTable = () => {
         <div>
             <QueryForm />
             <ResultTable
-                rowDataList={patientList}
+                rowDataList={currentPageData}
                 keyField="personName"
-                style={{
-                    width: "950px",
-                    margin: "10px auto",
-                }}
+                state={resultTableState}
+            />
+            <Pagination
+                pageSize={pageSize}
+                currentPage={currentPage}
+                totalCount={totalCount}
+                navToPage={navToPage}
+                navToPageSize={navToPageSize}
             />
         </div>
     )
@@ -117,6 +128,7 @@ const QueryForm = () => {
 
     return (
         <form
+            className="queryForm"
             onSubmit={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -178,7 +190,7 @@ const QueryForm = () => {
                         <Button
                             type="submit"
                             disabled={!canSubmit}
-                            className="h-[---row-height] bg-[--theme-fore-color] hover:bg-[--theme-fore-color-hover]"
+                            className="h-[--queryForm-row-height] bg-[--theme-fore-color] hover:bg-[--theme-fore-color-hover]"
                         >
                             {isSubmitting ? '查询中' : '查询'}
                         </Button>

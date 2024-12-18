@@ -6,23 +6,15 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-
 import DialogTriggerButton from "./component/DialogTriggerButton"
-import { ReactNode, useEffect } from "react"
-import { DivProp, TableProp } from "@/View/type"
-import { PatientProvider, usePatientService } from "@/service/PatientService"
-import { PaginationWithLinks } from "@/components/ui/pagination-with-links"
-import { Spinner } from "@/components/ui/spinner"
+import { ReactNode } from "react"
+import { DivProp } from "@/View/type"
+import { RetrievePatientProvider, useRetrievePatientService } from "@/service/RetrievePatientService"
 import { CustomInput, CustomInputCell } from "./component/CustomInput"
 import CustomCalendar from "./component/CustomCalendar"
+import Pagination from "./component/Pagination"
+import { ResultTable } from "./component/ResultTable"
+import { Button } from "@/components/ui/button"
 
 const RetrievePatientDialog = () => {
     return (
@@ -56,9 +48,9 @@ const RetrievePatientDialog = () => {
                 <DialogHeader>
                     <DialogTitle>检索病人</DialogTitle>
                 </DialogHeader>
-                <PatientProvider>
+                <RetrievePatientProvider>
                     <PatientTable />
-                </PatientProvider>
+                </RetrievePatientProvider>
             </DialogContent>
         </Dialog>
     )
@@ -66,36 +58,43 @@ const RetrievePatientDialog = () => {
 
 const PatientTable = () => {
     const {
-        fetchPatientInfoList
-    } = usePatientService()
+        currentPageData,
+        resultTableState,
+        currentPage,
+        totalCount,
+        pageSize,
+        navToPage,
+        navToPageSize
+    } = useRetrievePatientService()
 
-    useEffect(() => {
-        fetchPatientInfoList()
-    }, [])
+    // useEffect(() => {
+    //     fetchPatientInfoList()
+    // }, [])
 
     return (
         <div>
             <QueryForm />
-            <ResultTable
-                style={{
-                    width: "950px",
-                    margin: "10px auto",
-                    height: "250px",
-                    overflow: "auto",
-                }}
-            />
-            <Pagination />
+            <ResultTable state={resultTableState} rowDataList={currentPageData} keyField={"id"} />
+            {/* TODO: 我们需要继续完善这里的代码 */}
+            <Pagination currentPage={currentPage} totalCount={totalCount} pageSize={pageSize} navToPage={navToPage} navToPageSize={navToPageSize} />
         </div>
     )
 }
 
 const QueryForm = () => {
+    const {
+        form
+    } = useRetrievePatientService()
+
     return (
-        <div style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "5px"
-        }}>
+        <form
+            onSubmit={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                form.handleSubmit()
+            }}
+            className="queryForm"
+        >
             <Row
                 style={{
                     gap: "20px"
@@ -166,44 +165,46 @@ const QueryForm = () => {
             </Row>
             <Row
                 style={{
-                    gap: "20px"
+                    gap: "20px",
+                    display: "flex",
+                    justifyContent: "space-between"
                 }}
             >
-                <CustomInputCell
-                    label="生日:"
-                    containerWidth={190}
-                    inputWidth={150}
+                <div
+                    style={{
+                        display: "flex",
+                        gap: "10px"
+                    }}
                 >
-                    <CustomCalendar />
-                </CustomInputCell>
-                <CustomInputCell
-                    label="年龄:"
-                    containerWidth={130}
-                    inputWidth={80}
-                >
-                    <CustomInput />
-                </CustomInputCell>
+                    <CustomInputCell
+                        label="生日:"
+                        containerWidth={190}
+                        inputWidth={150}
+                    >
+                        <CustomCalendar />
+                    </CustomInputCell>
+                    <CustomInputCell
+                        label="年龄:"
+                        containerWidth={130}
+                        inputWidth={80}
+                    >
+                        <CustomInput />
+                    </CustomInputCell>
+                </div>
+                <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <Button
+                            type="submit"
+                            disabled={!canSubmit}
+                            className="h-[---row-height] bg-[--theme-fore-color] hover:bg-[--theme-fore-color-hover]"
+                        >
+                            {isSubmitting ? '查询中' : '查询'}
+                        </Button>
+                    )}
+                />
             </Row>
-        </div>
-    )
-}
-
-const Pagination = () => {
-    const {
-        currentPage,
-        totalCount,
-        pageSize
-    } = usePatientService()
-
-    return (
-        <PaginationWithLinks
-            pageSizeSelectOptions={{
-                pageSizeOptions: [5, 10, 20, 25]
-            }}
-            pageSize={pageSize}
-            page={currentPage}
-            totalCount={totalCount}
-        />
+        </form>
     )
 }
 
@@ -226,89 +227,6 @@ const Row = ({
             {children}
         </div>
     )
-}
-
-const ResultTable = ({ ...prop }: TableProp) => {
-
-    const {
-        patientInfoList
-    } = usePatientService()
-
-    console.log(patientInfoList)
-
-    let keyList: Array<string> = []
-
-    if (patientInfoList.length > 0) {
-        // 之后在做如果没有的情况
-        keyList = Object.keys(patientInfoList[0])
-
-        return (
-            <div
-                {...prop}
-                style={{
-                    border: "1px solid #c6babaa8",
-                    borderRadius: "10px",
-                    // height: "200px",
-                    // overflow: "auto",
-                    ...prop.style
-                }}
-                className="result-table"
-            >
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            {
-                                keyList.map((headerName) => {
-                                    return (
-                                        <TableHead>{headerName}</TableHead>
-                                    )
-                                })
-                            }
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {patientInfoList.map((patientInfo) => (
-                            <TableRow
-                                key={patientInfo.id}
-                            >
-                                {
-                                    keyList.map(key => {
-                                        return (
-                                            <TableCell
-                                                style={{
-                                                    whiteSpace: "nowrap"
-                                                }}
-                                            >
-                                                {
-                                                    // @ts-ignore
-                                                    patientInfo[key]
-                                                }
-                                            </TableCell>
-                                        )
-                                    })
-                                }
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </div>
-        )
-    } else {
-        return (
-            <div
-                {...prop}
-                style={{
-                    height: "250px",
-                    border: "1px solid #c6babaa8",
-                    borderRadius: "10px",
-                    ...prop.style
-                }}
-                className="center"
-            >
-                <Spinner className="stroke-[var(--theme-fore-color)]" />
-            </div>
-        )
-    }
 }
 
 export default RetrievePatientDialog
