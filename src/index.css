@@ -39,6 +39,12 @@
     --theme-fore-color-hover: #2da4b4ce;
     /* queryForm row height */
     --queryForm-row-height: 30px;
+    /* left content 中的组件的高度 */
+    --personal-info-height: 170px;
+    --history-result-height: 190px;
+    --examination-item-height: calc(
+      100% - var(--personal-info-height) - var(--history-result-height)
+    );
   }
 
   .dark {
@@ -167,7 +173,7 @@ input:-webkit-autofill {
 }
 
 .fore-button {
-  background-color: #2DA5B4;
+  background-color: #2da5b4;
   color: white;
   padding: 0px 10px;
   font-weight: normal;

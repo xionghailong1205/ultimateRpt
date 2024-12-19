@@ -10,7 +10,7 @@ const Overlay = () => {
                 patientPageStatus === "querying" ? (
                     <div
                         style={{
-                            background: "#8080806b",
+                            background: "#020202c9",
                             height: "100%",
                             width: "100%",
                             position: "absolute",

@@ -1,7 +1,7 @@
 import { Input } from '@/components/ui/input'
 import ScanIcon from '@/Icon/scan'
 import SearchIcon from '@/Icon/search'
-import { RetrieveExamRstByBHKCode } from '@/service/RetrievePatientInfoByBHKCode'
+import { RetrieveExamRstByBHKCode } from '@/service/RetrieveExamRstByBHKCodeService'
 import { useForm } from '@tanstack/react-form'
 
 const SearchBox = () => {
@@ -12,24 +12,12 @@ const SearchBox = () => {
             bhkCode: ''
         },
         onSubmit: async ({ value }) => {
-            console.log(value)
+            const {
+                bhkCode
+            } = value
 
-            // const {
-            //     bhkCode
-            // } = value
+            RetrieveExamRstByBHKCode.retrieveExamPatientInfo(bhkCode)
 
-            // setResultTableState("querying")
-
-            // const requestResult = await RetrievePatient.getPatientInfoByBHKCode(bhkCode)
-            // handleAuthenticationFailure(requestResult.code)
-
-            // if (requestResult.code === 500) {
-            //     alert("服务器查询出现错误!")
-            // }
-
-            // if (requestResult.code === 200) {
-            //     alert("请求成功, 我们执行之后的逻辑!")
-            // }
         },
         onSubmitInvalid(props) {
             const errMsg = props.formApi.state.fieldMeta.bhkCode.errors[0] as string

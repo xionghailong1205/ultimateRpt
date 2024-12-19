@@ -3,6 +3,13 @@
   display: flex;
   flex-direction: column;
   padding: 12px 15px;
-  width: var(--content-box-widths);
   border-radius: var(--box-radius);
+  width: 100%;
+  flex: 1;
+}
+
+.component-container {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 10px;
 }

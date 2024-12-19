@@ -1,5 +1,6 @@
 import { DivProp } from './type'
 import Title from "./Title"
+import { cn } from '@/lib/utils'
 
 const HistoryResultBox = ({
     ...prop
@@ -7,18 +8,13 @@ const HistoryResultBox = ({
     return (
         <div
             {...prop}
+            className={cn("component-container", prop.className)}
         >
             <Title
                 titleName='历史结果显示栏：'
-                style={{
-                    marginBottom: "10px"
-                }}
             />
             <div
-                className='left-content-box'
-                style={{
-                    height: "150px"
-                }}
+                className='left-content-box flex-1'
             >
                 <Row
                     content='轻度脂肪肝'

@@ -8,23 +8,21 @@ const Content = () => {
             className="scrollable-container"
             style={{
                 width: "100%",
-                overflow: "auto"
+                overflow: "auto",
+                height: "100%"
             }}
         >
             <div
                 style={{
-                    flex: 1,
-                    // minHeight: "800px",
                     display: "flex",
                     padding: "20px 30px",
                     justifyContent: "space-between",
-                    minWidth: "1400px"
+                    minWidth: "1400px",
+                    height: "100%"
                 }}
             >
                 <LeftContent
-                // style={{
-                //     flex: 1
-                // }}
+                    className="w-[--content-box-width] h-full"
                 />
                 <CenterContent
                     style={{
@@ -32,11 +30,7 @@ const Content = () => {
                         height: "var(--bodypart-box-height)"
                     }}
                 />
-                <RightContent
-                // style={{
-                //     flex: 1
-                // }}
-                />
+                <RightContent />
             </div >
         </div>
     )

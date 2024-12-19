@@ -14,6 +14,7 @@ const Title = ({
             style={{
                 fontSize: "14px",
                 fontWeight: "bold",
+                height: "30px",
                 ...prop.style
             }}
         >

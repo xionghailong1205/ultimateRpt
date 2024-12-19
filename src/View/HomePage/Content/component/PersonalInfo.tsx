@@ -1,24 +1,30 @@
 import { ReactNode } from "react"
 import Title from "./Title"
 import { DivProp } from './type'
+import { usePatientInfoPage } from "@/store/usePatientInfoPage"
+import { cn } from "@/lib/utils"
 
 const PersonalInfo = ({
     ...prop
 }: DivProp) => {
+    const bhkCode = usePatientInfoPage(state => state.bhkCode)
+    const personName = usePatientInfoPage(state => state.personName)
+    const sex = usePatientInfoPage(state => state.sex)
+    const age = usePatientInfoPage(state => state.age)
+
+
     return (
         <div
             {...prop}
+            className={cn("component-container", prop.className)}
         >
             <Title
                 titleName='个人信息栏'
-                style={{
-                    marginBottom: "10px",
-                }}
             />
             <div
                 className='left-content-box'
                 style={{
-                    gap: "15px"
+                    justifyContent: "space-between"
                 }}
             >
                 <Row
@@ -29,7 +35,7 @@ const PersonalInfo = ({
                             <span>号:</span>
                         </>
                     )}
-                    value="5458274572875834"
+                    value={bhkCode}
                 />
                 <Row
                     label={(
@@ -38,7 +44,7 @@ const PersonalInfo = ({
                             <span>名:</span>
                         </>
                     )}
-                    value="王大明"
+                    value={personName}
                 />
                 <Row
                     label={(
@@ -47,7 +53,7 @@ const PersonalInfo = ({
                             <span>别:</span>
                         </>
                     )}
-                    value="女"
+                    value={sex}
                 />
                 <Row
                     label={(
@@ -56,7 +62,7 @@ const PersonalInfo = ({
                             <span>龄:</span>
                         </>
                     )}
-                    value="36"
+                    value={age}
                 />
             </div>
         </div>

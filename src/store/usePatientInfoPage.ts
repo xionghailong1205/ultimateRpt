@@ -9,7 +9,7 @@ interface State extends PatinetInfoWithExaminationResult {
 }
 
 interface Action {
-  changePatietnPageStatus: (newStatus: PatientPageStatus) => void;
+  changePatientPageStatus: (newStatus: PatientPageStatus) => void;
   updatePatientInfoAfterQuery: (
     patientInfoFromBE: PatinetInfoWithExaminationResult
   ) => void;
@@ -39,10 +39,14 @@ export const usePatientInfoPage = create<PatientPageProp>((set) => ({
   badRsn: "",
   createTime: "",
   updateTime: "",
-  changePatietnPageStatus(newStatus) {
+  changePatientPageStatus(newStatus) {
     set({
       patientPageStatus: newStatus,
     });
   },
-  updatePatientInfoAfterQuery(patientInfoFromBE) {},
+  updatePatientInfoAfterQuery(patientInfoFromBE) {
+    set({
+      ...patientInfoFromBE,
+    });
+  },
 }));
