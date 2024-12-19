@@ -5,31 +5,39 @@ import RightContent from "./component/RightContent"
 const Content = () => {
     return (
         <div
+            className="scrollable-container"
             style={{
-                flex: 1,
-                // minHeight: "800px",
-                display: "flex",
-                padding: "20px 30px",
-                justifyContent: "space-between",
+                width: "100%",
                 overflow: "auto"
             }}
         >
-            <LeftContent
-            // style={{
-            //     flex: 1
-            // }}
-            />
-            <CenterContent
+            <div
                 style={{
-                    minWidth: "800px",
-                    height: "var(--bodypart-box-height)"
+                    flex: 1,
+                    // minHeight: "800px",
+                    display: "flex",
+                    padding: "20px 30px",
+                    justifyContent: "space-between",
+                    minWidth: "1400px"
                 }}
-            />
-            <RightContent
-            // style={{
-            //     flex: 1
-            // }}
-            />
+            >
+                <LeftContent
+                // style={{
+                //     flex: 1
+                // }}
+                />
+                <CenterContent
+                    style={{
+                        minWidth: "800px",
+                        height: "var(--bodypart-box-height)"
+                    }}
+                />
+                <RightContent
+                // style={{
+                //     flex: 1
+                // }}
+                />
+            </div >
         </div>
     )
 }

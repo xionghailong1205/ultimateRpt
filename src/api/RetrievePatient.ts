@@ -1,6 +1,4 @@
 import config from "./config";
-import Cookies from "js-cookie";
-import { handleAuthenticationFailure } from "./utils/handleAuthenticationFailure";
 
 const baseURL = config.apiBaseUrl;
 
@@ -37,6 +35,33 @@ interface FetchPatientListOfPageResult {
   patientList: Array<PatientInfo>;
 }
 
+interface ExaminationResult {
+  id: number;
+  bhkCode: string;
+  itemName: string;
+  itemCode: string;
+  itemStdValue: any;
+  result: string;
+  chkDat: string;
+  chkDoct: string;
+  jdgptn: string;
+  minVa: any;
+  maxVal: any;
+  createTime: string;
+  updateTime: string;
+  resultDiseases: any;
+}
+
+export interface PatinetInfoWithExaminationResult extends PatientInfo {
+  examResults: Array<ExaminationResult>;
+}
+
+interface FetchPatientInfoByBHKCodeResult {
+  code: number;
+  msg: string;
+  data: PatinetInfoWithExaminationResult;
+}
+
 export namespace RetrievePatient {
   export const getPatientListOfPage = async ({
     pageNumber,
@@ -62,5 +87,19 @@ export namespace RetrievePatient {
       totalCount: requestResult.total,
       patientList: requestResult.rows,
     };
+  };
+
+  export const getPatientInfoByBHKCode = async (bhkCode: string) => {
+    let headersList = {
+      Accept: "*/*",
+    };
+
+    let response = await fetch(`${baseURL}/exam/person/${bhkCode}`, {
+      method: "GET",
+      headers: headersList,
+    });
+
+    let result = (await response.json()) as FetchPatientInfoByBHKCodeResult;
+    return result;
   };
 }

@@ -86,8 +86,9 @@
 body {
   margin: 0px;
   height: 100vh;
+  width: 100vw;
+  overflow: hidden;
   background-color: #edf5f6;
-  min-width: 1400px;
   font-size: 12px;
 }
 
@@ -97,14 +98,9 @@ body {
   align-items: center;
 }
 
-/* 
-.test {
-  height: calc(100% -60px);
-} */
-
-/* body::-webkit-scrollbar {
+.scrollable-container::-webkit-scrollbar {
   display: none;
-} */
+}
 
 ::-webkit-scrollbar-corner {
   display: none;
@@ -168,4 +164,14 @@ input:-webkit-autofill {
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+
+.fore-button {
+  background-color: #2DA5B4;
+  color: white;
+  padding: 0px 10px;
+  font-weight: normal;
+  font-size: 12px;
+  height: 25px;
+  border-radius: 2px;
 }

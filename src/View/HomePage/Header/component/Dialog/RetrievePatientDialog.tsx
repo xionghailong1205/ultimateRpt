@@ -67,10 +67,6 @@ const PatientTable = () => {
         navToPageSize
     } = useRetrievePatientService()
 
-    // useEffect(() => {
-    //     fetchPatientInfoList()
-    // }, [])
-
     return (
         <div>
             <QueryForm />

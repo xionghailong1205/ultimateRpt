@@ -1,12 +1,55 @@
 import { Input } from '@/components/ui/input'
 import ScanIcon from '@/Icon/scan'
 import SearchIcon from '@/Icon/search'
+import { RetrieveExamRstByBHKCode } from '@/service/RetrievePatientInfoByBHKCode'
+import { useForm } from '@tanstack/react-form'
 
 const SearchBox = () => {
+    const form = useForm<{
+        bhkCode: string
+    }, undefined>({
+        defaultValues: {
+            bhkCode: ''
+        },
+        onSubmit: async ({ value }) => {
+            console.log(value)
+
+            // const {
+            //     bhkCode
+            // } = value
+
+            // setResultTableState("querying")
+
+            // const requestResult = await RetrievePatient.getPatientInfoByBHKCode(bhkCode)
+            // handleAuthenticationFailure(requestResult.code)
+
+            // if (requestResult.code === 500) {
+            //     alert("服务器查询出现错误!")
+            // }
+
+            // if (requestResult.code === 200) {
+            //     alert("请求成功, 我们执行之后的逻辑!")
+            // }
+        },
+        onSubmitInvalid(props) {
+            const errMsg = props.formApi.state.fieldMeta.bhkCode.errors[0] as string
+            RetrieveExamRstByBHKCode.showAlertDialogTipRetrieveError(errMsg)
+        },
+    })
+
     return (
-        <div
+        <form
             style={{
                 width: "250px"
+            }}
+            onSubmit={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (!form.state.canSubmit) {
+                    const errMsg = form.state.fieldMeta.bhkCode.errors[0] as string
+                    RetrieveExamRstByBHKCode.showAlertDialogTipRetrieveError(errMsg)
+                }
+                form.handleSubmit()
             }}
         >
             <div
@@ -32,13 +75,28 @@ const SearchBox = () => {
                         }}
                     />
                 </div>
-                <Input
-                    style={{
-                        border: "none",
-                        fontSize: "12px"
+                <form.Field
+                    name='bhkCode'
+                    validators={{
+                        onChange: ({ value }) =>
+                            !value
+                                ? '请输入体检号'
+                                : undefined
                     }}
-                    className=' placeholder:text-[#9B9B9B]'
-                    placeholder='输入检查号查询患者'
+                    children={(field) => {
+                        return (
+                            <Input
+                                style={{
+                                    border: "none",
+                                    fontSize: "12px"
+                                }}
+                                className=' placeholder:text-[#9B9B9B]'
+                                placeholder='输入体检号查询患者'
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                value={field.state.value}
+                            />
+                        )
+                    }}
                 />
                 <div
                     style={{
@@ -47,14 +105,29 @@ const SearchBox = () => {
                     }}
                     className='center'
                 >
-                    <SearchIcon
-                        style={{
-                            fill: "#2DA5B4"
+                    <form.Subscribe
+                        selector={(state) => [state.canSubmit, state.isSubmitting]}
+                        children={() => {
+                            return (
+                                <button
+                                    type='submit'
+                                    style={{
+                                        height: "100%",
+                                        width: "100%",
+                                    }}
+                                >
+                                    <SearchIcon
+                                        style={{
+                                            fill: "#2DA5B4"
+                                        }}
+                                    />
+                                </button>
+                            )
                         }}
                     />
                 </div>
             </div>
-        </div>
+        </form>
     )
 }
 

@@ -4,7 +4,6 @@ import { AccountInfo, Auth } from "@/api/Auth";
 import { md5 } from "js-md5";
 
 interface State {
-  // 'Authorization=9e1c96d0-c4ca-402f-9c21-4417dac9e4fc'
   Authorization: string | undefined;
 }
 
