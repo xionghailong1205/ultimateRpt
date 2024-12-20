@@ -1,58 +1,23 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-
-import DialogTriggerButton from "./component/DialogTriggerButton"
 import { ReactNode } from "react"
 import { DivProp } from "@/View/type"
 import { RetrievePatientProvider, useRetrievePatientService } from "@/service/RetrievePatientService"
 import { CustomInput, CustomInputCell } from "./component/CustomInput"
-import CustomCalendar from "./component/CustomCalendar"
+import CalendarUsedInDialog from "./component/CalendarUsedInDialog"
 import Pagination from "./component/Pagination"
 import { ResultTable } from "./component/ResultTable"
 import { Button } from "@/components/ui/button"
+import { DialogWrapper } from "./BaseDialogWrapper"
 
 const RetrievePatientDialog = () => {
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <div>
-                    <DialogTriggerButton
-                        buttonName="检索病人"
-                    />
-                </div>
-            </DialogTrigger>
-            <DialogContent
-                style={{
-                    width: "1000px",
-                    maxWidth: "1000px",
-                    minWidth: "1000px"
-                }}
-
-                onPointerDownOutside={
-                    (event) => {
-                        event.preventDefault()
-                    }
-                }
-
-                onOpenAutoFocus={
-                    (event) => {
-                        event.preventDefault()
-                    }
-                }
-            >
-                <DialogHeader>
-                    <DialogTitle>检索病人</DialogTitle>
-                </DialogHeader>
+        <DialogWrapper
+            title="检索病人"
+            tableComponent={
                 <RetrievePatientProvider>
                     <PatientTable />
                 </RetrievePatientProvider>
-            </DialogContent>
-        </Dialog>
+            }
+        />
     )
 }
 
@@ -122,7 +87,7 @@ const QueryForm = () => {
                     containerWidth={210}
                     inputWidth={140}
                 >
-                    <CustomCalendar />
+                    <CalendarUsedInDialog />
                 </CustomInputCell>
             </Row>
             <Row
@@ -177,7 +142,7 @@ const QueryForm = () => {
                         containerWidth={190}
                         inputWidth={150}
                     >
-                        <CustomCalendar />
+                        <CalendarUsedInDialog />
                     </CustomInputCell>
                     <CustomInputCell
                         label="年龄:"
@@ -193,7 +158,10 @@ const QueryForm = () => {
                         <Button
                             type="submit"
                             disabled={!canSubmit}
-                            className="h-[---row-height] bg-[--theme-fore-color] hover:bg-[--theme-fore-color-hover]"
+                            className="h-[--queryForm-row-height] bg-[--theme-fore-color] hover:bg-[--theme-fore-color-hover]"
+                            style={{
+                                fontSize: "var(--global-font-size)"
+                            }}
                         >
                             {isSubmitting ? '查询中' : '查询'}
                         </Button>

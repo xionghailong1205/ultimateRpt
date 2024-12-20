@@ -42,6 +42,8 @@
     /* left content 中的组件的高度 */
     --personal-info-height: 170px;
     --history-result-height: 190px;
+    /* 全局字体大小 */
+    --global-font-size: 12px;
     --examination-item-height: calc(
       100% - var(--personal-info-height) - var(--history-result-height)
     );
@@ -95,7 +97,7 @@ body {
   width: 100vw;
   overflow: hidden;
   background-color: #edf5f6;
-  font-size: 12px;
+  font-size: var(--global-font-size);
 }
 
 .center {

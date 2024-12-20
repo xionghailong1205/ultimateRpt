@@ -7,12 +7,23 @@ import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { zhCN } from "date-fns/locale"
+import { useDialogContext } from "../BaseDialogWrapper"
 
-const CustomCalendar = () => {
+const CalendarUsedInDialog = () => {
     const [date, setDate] = React.useState<Date | undefined>(new Date())
+    const [open, setOpen] = React.useState<boolean>(false)
+    const {
+        setHasPopOverOpen
+    } = useDialogContext()
 
     return (
-        <Popover>
+        <Popover
+            modal={true}
+            open={open}
+            onOpenChange={(open) => {
+                setHasPopOverOpen(open)
+            }}
+        >
             <PopoverTrigger asChild>
                 <Button
                     variant={"outline"}
@@ -20,6 +31,9 @@ const CustomCalendar = () => {
                         "text-[12px] h-[30px] pl-3 text-left font-normal w-full focus-visible:ring-[#2da5b4]",
                         !date && "text-muted-foreground"
                     )}
+                    onClick={() => {
+                        setOpen(true)
+                    }}
                 >
                     {date ? (
                         format(date, "PPP", {
@@ -31,7 +45,18 @@ const CustomCalendar = () => {
                     <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent
+                className="w-auto p-0"
+                align="start"
+                onEscapeKeyDown={() => {
+                    // e.preventDefault()
+                    setHasPopOverOpen(false)
+                    setOpen(false)
+                }}
+                onPointerDownOutside={() => {
+                    setOpen(false)
+                }}
+            >
                 <Calendar
                     mode="single"
                     selected={date}
@@ -46,4 +71,4 @@ const CustomCalendar = () => {
     )
 }
 
-export default CustomCalendar
+export default CalendarUsedInDialog
