@@ -35,7 +35,7 @@ interface FetchPatientListOfPageResult {
   patientList: Array<PatientInfo>;
 }
 
-interface ExaminationResult {
+export interface ExaminationResult {
   id: number;
   bhkCode: string;
   itemName: string;

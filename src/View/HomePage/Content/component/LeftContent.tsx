@@ -11,7 +11,7 @@ const LeftContent = ({
         <div
             {...prop}
             style={{
-                minHeight: "800px",
+                minHeight: "680px",
                 display: "flex",
                 flexDirection: "column",
             }}
