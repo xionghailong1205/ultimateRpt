@@ -24,6 +24,30 @@ export interface PatientInfo {
   updateTime: undefined;
 }
 
+type Version = "v1" | "v2";
+
+export interface PropForPatientEntry {
+  personName: string;
+  bhkCode: string;
+  institutionCode?: string;
+  crptName?: string;
+  sex?: string;
+  idc?: string;
+  brth?: string;
+  age?: string;
+  isXrMd?: undefined;
+  lnkTel?: string;
+  wrkLnt?: string;
+  wrkLntMonth?: string;
+  tchBadRsnTim?: string;
+  tchBadRsnMonth?: string;
+  bhkDate: string;
+  badRsn?: string;
+  version: Version;
+}
+
+export type KeyForPatientEntry = keyof PropForPatientEntry;
+
 interface FetchPatientInfoListFromMeichiAPIResult {
   code: number;
   data: Array<PatientInfo>;
@@ -58,6 +82,9 @@ export namespace EntryPatient {
 
     let result =
       (await response.json()) as FetchPatientInfoListFromMeichiAPIResult;
+
+    console.log(result);
+
     return result;
   };
 }

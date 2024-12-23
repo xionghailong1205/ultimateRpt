@@ -18,7 +18,8 @@ const Content = () => {
                     padding: "20px 30px",
                     justifyContent: "space-between",
                     minWidth: "1400px",
-                    height: "100%"
+                    height: "100%",
+                    gap: "5%"
                 }}
             >
                 <LeftContent
@@ -26,8 +27,9 @@ const Content = () => {
                 />
                 <CenterContent
                     style={{
+                        flex: 1,
                         minWidth: "800px",
-                        height: "var(--bodypart-box-height)"
+                        minHeight: "650px",
                     }}
                 />
                 <RightContent />

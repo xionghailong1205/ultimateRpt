@@ -1,0 +1,7 @@
+.editor-box {
+  --box-header-height: 45px;
+  --box-footer-height: 40px;
+  --box-content-height: calc(100% - var(--box-header-height) - var(--box-footer-height));
+  --normal-input-height: 30px;
+  --textare-input-height: 60px
+}

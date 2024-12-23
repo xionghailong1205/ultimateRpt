@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import RetrievePatientDialog from './Dialog/RetrievePatientDialog'
 import EntryPatientDialog from './Dialog/EntryPatientDialog'
-import ExaminationItemManagementDialog from './Dialog/ExaminationItemManagementDialog'
+import ModuleManagementDialog from './Dialog/ModuleManagementDialog'
 
 // import UserManagement from './UserManagement'
 
@@ -21,7 +21,7 @@ const DialogTriggerList = () => {
                 }}
             /> */}
             <RetrievePatientDialog />
-            <ExaminationItemManagementDialog />
+            <ModuleManagementDialog />
             {/* <NavButton
                 buttonName='录入病人'
                 callback={() => {

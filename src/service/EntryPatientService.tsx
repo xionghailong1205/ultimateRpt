@@ -2,7 +2,7 @@ import { DateRange } from "react-day-picker"
 import { createContext, ReactNode, useContext, useState } from "react";
 import { ReactFormExtendedApi, useForm } from "@tanstack/react-form";
 import { formatISO } from "date-fns";
-import { EntryPatient, PatientInfo } from "@/api/EntryPatient";
+import { EntryPatient, PatientInfo, PropForPatientEntry } from "@/api/EntryPatient";
 import { ResultTableState } from "@/View/HomePage/Header/component/Dialog/component/ResultTable";
 import { handleAuthenticationFailure } from "@/api/utils/handleAuthenticationFailure";
 
@@ -20,10 +20,21 @@ interface TableProp<T> {
 }
 
 // 12.16 添加查询结果列表
-interface EntryPatientServiceProp extends TableProp<PatientInfo> {
+interface EntryPatientServiceProp extends TableProp<PatientTableRowDataProp> {
     form: ReactFormExtendedApi<{
         dateRange: DateRangeOfQuery;
     }, undefined>;
+    formForEntryPatient: ReactFormExtendedApi<PropForPatientEntry, undefined>
+}
+
+interface PatientTableRowDataProp {
+    bhkCode: string;
+    personName: string;
+    sex: string;
+    age: string;
+    idc: string;
+    bhkDate: string;
+    crptName: string;
 }
 
 const EntryPatientContext = createContext<EntryPatientServiceProp>(null!)
@@ -43,7 +54,17 @@ export const EntryPatientProvider = ({
     const start = (currentPage - 1) * pageSize
     const end = start + pageSize
 
-    const currentPageData = patientList.slice(start, end)
+    const currentPageData: Array<PatientTableRowDataProp> = patientList.slice(start, end).map(patientInfo => {
+        return {
+            bhkCode: patientInfo.bhkCode,
+            personName: patientInfo.personName,
+            sex: patientInfo.sex,
+            age: patientInfo.age,
+            idc: patientInfo.idc,
+            bhkDate: patientInfo.bhkDate,
+            crptName: patientInfo.crptName
+        }
+    })
 
     const navToPage = (targetPage: number) => {
         setCurrentPage(targetPage)
@@ -88,6 +109,18 @@ export const EntryPatientProvider = ({
         }
     })
 
+    const formForEntryPatient = useForm<PropForPatientEntry, undefined>({
+        defaultValues: {
+            personName: "nihao",
+            bhkCode: "",
+            bhkDate: "",
+            version: "v1"
+        },
+        onSubmit: async ({ value }) => {
+            alert("之后执行逻辑")
+        }
+    })
+
     const value = {
         resultTableState,
         form,
@@ -96,7 +129,8 @@ export const EntryPatientProvider = ({
         pageSize,
         currentPage,
         navToPage,
-        navToPageSize
+        navToPageSize,
+        formForEntryPatient
     }
 
     return <EntryPatientContext.Provider value={value}>{children}</EntryPatientContext.Provider>

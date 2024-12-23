@@ -4,6 +4,7 @@ import { usePatientInfoPage } from "@/store/usePatientInfoPage"
 import { cn } from "@/lib/utils"
 import CircleIcon from "@/Icon/circle"
 import { ExaminationItemHelper } from "@/util/ExaminationItemFilter"
+import { SelectInput } from "@/components/Inputer/SelectInput"
 
 // 检查项目的组件
 export const ExaminationItem = ({
@@ -11,6 +12,8 @@ export const ExaminationItem = ({
 }: DivProp) => {
     const examResults = usePatientInfoPage(state => state.examResults)
     const examRstInUltimateSound = ExaminationItemHelper.getItemCodeInUltimateSoundExaminationList(examResults)
+
+    console.log(examRstInUltimateSound)
 
     return (
         <div

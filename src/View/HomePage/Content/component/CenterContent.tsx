@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react"
 import { DivProp } from "./type"
-
+import { BodyPartBoxProp, BodyPartService } from "@/service/BodyPartService"
 
 const CenterContent = ({ ...prop }: DivProp) => {
     return (
@@ -13,32 +13,47 @@ const CenterContent = ({ ...prop }: DivProp) => {
                 ...prop.style,
             }}
         >
-            <BodyPartList />
+            <BodyPartList
+                bodyPartInfoList={BodyPartService.getRightBodyPartList()}
+            />
             <BodyPartOverview />
-            <BodyPartList />
+            <BodyPartList
+                bodyPartInfoList={BodyPartService.getLeftBodyPartList()}
+            />
         </div>
     )
 }
 
-const BodyPartList = ({ ...prop }: DivProp) => {
+interface BodyPartListProp extends DivProp {
+    bodyPartInfoList: Array<BodyPartBoxProp>
+}
+
+const BodyPartList = ({
+    bodyPartInfoList,
+    ...prop
+}: BodyPartListProp) => {
     return (
         <div
             {...prop}
             style={{
-                padding: "0px 20px",
+                padding: "5% 20px",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center",
-                gap: "30px"
+                justifyContent: "space-around",
+                gap: "2%",
+                width: "25%",
+                ...prop.style
             }}
         >
-            <BodyPartBox />
-            <BodyPartBox />
-            <BodyPartBox />
-            <BodyPartBox />
-            <BodyPartBox />
-            <BodyPartBox />
-            <BodyPartBox />
+            {
+                bodyPartInfoList.map(bodyPartInfo => {
+                    return (
+                        <BodyPartBox
+                            {...bodyPartInfo}
+                        />
+                    )
+                })
+            }
         </div>
     )
 }
@@ -70,15 +85,16 @@ const BodyPartOverview = ({ ...prop }: DivProp) => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                flex: 1
+                flex: 1,
+                ...prop.style
             }}
         >
             <canvas
                 ref={canvasRef}
                 style={{
                     aspectRatio: 0.3125,
-                    height: "var(--bodypart-box-height)",
                 }}
+                className="h-full"
                 width="150px"
                 height="480px"
             >
@@ -89,20 +105,24 @@ const BodyPartOverview = ({ ...prop }: DivProp) => {
     )
 }
 
-const BodyPartBox = () => {
+const BodyPartBox = ({
+    keyValue,
+    label
+}: BodyPartBoxProp) => {
     return (
         <div
             style={{
                 border: "1px solid #2DA5B4",
                 borderRadius: "10px",
-                width: "150px",
                 display: "flex",
                 padding: "5px 10px",
+                height: "8%",
+                maxWidth: "200px",
+                minWidth: "150px",
+                maxHeight: "50px",
+                width: "80%"
             }}
         >
-            <img
-                src="/bodyPart/thyroid_left.png"
-            />
             <div
                 style={{
                     display: "flex",
@@ -114,7 +134,7 @@ const BodyPartBox = () => {
                         color: "#2DA5B4"
                     }}
                 >
-                    甲状腺右侧
+                    {label}
                 </span>
                 <span
                     style={{

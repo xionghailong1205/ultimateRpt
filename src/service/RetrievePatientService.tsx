@@ -1,9 +1,9 @@
-import { PatientInfo, RetrievePatient } from "@/api/RetrievePatient";
+import { PatientInfo, PatientService } from "@/api/PatientService";
 import { handleAuthenticationFailure } from "@/api/utils/handleAuthenticationFailure";
 import { ResultTableState } from "@/View/HomePage/Header/component/Dialog/component/ResultTable";
 import { DialogTableProp } from "@/View/HomePage/Header/component/Dialog/Type";
 import { ReactFormExtendedApi, useForm } from "@tanstack/react-form";
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 
 interface RetrievePatientServiceAPIProp {
     id: string
@@ -19,11 +19,21 @@ interface FetchPatientInfoListProp {
     targetPage: number
 }
 
+interface PatientTableRowDataProp {
+    bhkCode: string;
+    personName: string;
+    sex: string;
+    age: string;
+    idc: string;
+    bhkDate: string;
+    crptName: string;
+}
+
 export const RetrievePatientProvider = ({ children }: {
     children: ReactNode
 }) => {
     const [resultTableState, setResultTableState] = useState<ResultTableState>('waitQuery')
-    const [currentPageData, setCurrentPageData] = useState<Array<PatientInfo>>([])
+    const [currentPageData, setCurrentPageData] = useState<Array<PatientTableRowDataProp>>([])
     const [currentPage, setCurrentPage] = useState(1)
     const [totalCount, setTotalCount] = useState(1)
     const [pageSize, setPageSize] = useState(5)
@@ -33,7 +43,7 @@ export const RetrievePatientProvider = ({ children }: {
     }: FetchPatientInfoListProp) => {
         setResultTableState("querying")
 
-        const requestResult = await RetrievePatient.getPatientListOfPage({
+        const requestResult = await PatientService.getPatientListOfPage({
             pageNumber: targetPage,
             pageSize
         })
@@ -45,7 +55,22 @@ export const RetrievePatientProvider = ({ children }: {
         if (requestResult.code === 200) {
             if (requestResult.patientList.length > 0) {
                 setResultTableState("HaveResultAfterQuerying")
-                setCurrentPageData(requestResult.patientList)
+
+                const patientList = requestResult.patientList
+
+                const patientTableRowList: Array<PatientTableRowDataProp> = patientList.map(patientInfo => {
+                    return {
+                        bhkCode: patientInfo.bhkCode,
+                        personName: patientInfo.personName,
+                        sex: patientInfo.sex,
+                        age: patientInfo.age,
+                        idc: patientInfo.idc,
+                        bhkDate: patientInfo.bhkDate,
+                        crptName: patientInfo.crptName
+                    }
+                })
+
+                setCurrentPageData(patientTableRowList)
                 setTotalCount(requestResult.totalCount)
             } else {
                 setResultTableState("noResultAfterQuerying")

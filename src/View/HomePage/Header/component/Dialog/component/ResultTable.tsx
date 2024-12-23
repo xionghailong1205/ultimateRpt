@@ -8,6 +8,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { Key2LabelService } from "@/map/key2LabelService"
 import { ReactNode } from "react"
 
 export type ResultTableState = "waitQuery" | "querying" | "noResultAfterQuerying" | "HaveResultAfterQuerying"
@@ -87,7 +88,13 @@ export const ResultTable = ({
                                 {
                                     keyList.map((headerName) => {
                                         return (
-                                            <TableHead>{headerName}</TableHead>
+                                            <TableHead
+                                                style={{
+                                                    whiteSpace: "nowrap"
+                                                }}
+                                            >
+                                                {Key2LabelService.getLabel(headerName)}
+                                            </TableHead>
                                         )
                                     })
                                 }

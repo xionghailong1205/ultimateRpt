@@ -1,4 +1,4 @@
-import { RetrievePatient } from "@/api/RetrievePatient";
+import { PatientService } from "@/api/PatientService";
 import { handleAuthenticationFailure } from "@/api/utils/handleAuthenticationFailure";
 import { useAlertDialog } from "@/store/useAlertDialog";
 import { usePatientInfoPage } from "@/store/usePatientInfoPage";
@@ -13,9 +13,7 @@ export namespace RetrieveExamRstByBHKCode {
     const updatePatientInfoAfterQuery =
       usePatientInfoPage.getState().updatePatientInfoAfterQuery;
 
-    const requestResult = await RetrievePatient.getPatientInfoByBHKCode(
-      bhkCode
-    );
+    const requestResult = await PatientService.getPatientInfoByBHKCode(bhkCode);
 
     handleAuthenticationFailure(requestResult.code);
 

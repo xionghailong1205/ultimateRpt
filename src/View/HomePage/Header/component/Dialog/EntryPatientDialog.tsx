@@ -1,11 +1,3 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import DialogTriggerButton from "./component/DialogTriggerButton"
 import { DatePickerWithRange } from "./component/DateRangePicker"
 import { DateRangeOfQuery, EntryPatientProvider, useEntryPatientService } from "@/service/EntryPatientService"
 import clsx from "clsx"
@@ -15,44 +7,29 @@ import { ReactNode } from "react"
 import { CustomInputCell } from "./component/CustomInput"
 import { ResultTable } from "./component/ResultTable"
 import Pagination from "./component/Pagination"
+import { DialogWrapper } from "./BaseDialogWrapper"
+
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@/components/ui/tabs"
+import { Key2LabelService } from "@/map/key2LabelService"
+import { TableInputCol, TableSchema } from "@/service/TableService/EntryPatientTableService"
+import { KeyForPatientEntry } from "@/api/EntryPatient"
+import ButtonInTable from "@/components/StyledComponent/ButtonInTable"
 
 const EntryPatientDialog = () => {
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <div>
-                    <DialogTriggerButton
-                        buttonName="录入病人"
-                    />
-                </div>
-            </DialogTrigger>
-            <DialogContent
-                style={{
-                    width: "1000px",
-                    maxWidth: "1000px",
-                    minWidth: "1000px"
-                }}
-
-                onPointerDownOutside={
-                    (event) => {
-                        event.preventDefault()
-                    }
-                }
-
-                onOpenAutoFocus={
-                    (event) => {
-                        event.preventDefault()
-                    }
-                }
-            >
-                <DialogHeader>
-                    <DialogTitle>录入病人</DialogTitle>
-                </DialogHeader>
+        <DialogWrapper
+            title="检索病人"
+            tableComponent={
                 <EntryPatientProvider>
                     <EntryPatientTable />
                 </EntryPatientProvider>
-            </DialogContent>
-        </Dialog>
+            }
+        />
     )
 }
 
@@ -70,6 +47,41 @@ const validateSelectDateRange = (dateRange: DateRangeOfQuery) => {
 }
 
 const EntryPatientTable = () => {
+    // 添加简单的登陆验证
+    return (
+        <div>
+            <Tabs defaultValue="apiEntry" className="w-full">
+                <TabsList
+                    className="w-full bg-white"
+                >
+                    <TabsTrigger value="apiEntry"
+                        className="w-full"
+                    >
+                        从美慈APP录入
+                    </TabsTrigger>
+                    <TabsTrigger value="manualEntry"
+                        className="w-full"
+                    >
+                        手动录入
+                    </TabsTrigger>
+                </TabsList>
+                <TabsContent
+                    value="apiEntry"
+                    className="border"
+                >
+                    <ApiEntryTable />
+                </TabsContent>
+                <TabsContent value="manualEntry"
+                    className="border"
+                >
+                    <ManualEntryTable />
+                </TabsContent>
+            </Tabs>
+        </div>
+    )
+}
+
+const ApiEntryTable = () => {
     const {
         currentPageData,
         resultTableState,
@@ -80,9 +92,10 @@ const EntryPatientTable = () => {
         navToPageSize
     } = useEntryPatientService()
 
-    // 添加简单的登陆验证
     return (
-        <div>
+        <div
+            className="px-2 py-2"
+        >
             <QueryForm />
             <ResultTable
                 rowDataList={currentPageData}
@@ -100,7 +113,188 @@ const EntryPatientTable = () => {
     )
 }
 
-// 我们在这个位置添加 Table 我们对现有的 Table 进行封装
+const ManualEntryTable = () => {
+    const {
+        formForEntryPatient: form
+    } = useEntryPatientService()
+
+    const getLabel = Key2LabelService.getLabel
+
+    const tableSchemaList: Array<TableSchema<KeyForPatientEntry>> = [
+        {
+            key: "personName",
+            label: getLabel("personName"),
+            type: "input"
+        },
+        {
+            key: "bhkCode",
+            label: getLabel("bhkCode"),
+            type: "input"
+        },
+        {
+            key: "institutionCode",
+            label: getLabel("institutionCode"),
+            type: "input"
+        },
+        {
+            key: "sex",
+            label: getLabel("sex"),
+            type: "input"
+        },
+        {
+            key: "idc",
+            label: getLabel("idc"),
+            type: "input",
+        },
+        {
+            key: "brth",
+            label: getLabel("brth"),
+            type: "input"
+        },
+        {
+            key: "age",
+            label: getLabel("age"),
+            type: "input",
+            inputType: "number"
+        },
+        {
+            key: "isXrMd",
+            label: getLabel("isXrMd"),
+            type: "selector",
+            selectInputProp: {
+                placeHolder: "选择是否已婚",
+                optionList: [
+                    {
+                        label: "是",
+                        value: "true"
+                    },
+                    {
+                        label: "否",
+                        value: "false"
+                    }
+                ]
+            }
+        },
+        {
+            key: "lnkTel",
+            label: getLabel("lnkTel"),
+            type: "input",
+            inputType: "tel"
+        },
+        {
+            key: "wrkLnt",
+            label: getLabel("wrkLnt"),
+            type: "input",
+            inputType: "number"
+        },
+        {
+            key: "wrkLntMonth",
+            label: getLabel("wrkLntMonth"),
+            type: "input",
+            inputType: "number"
+        },
+        {
+            key: "tchBadRsnTim",
+            label: getLabel("tchBadRsnTim"),
+            type: "input",
+            inputType: "number"
+        },
+        {
+            key: "tchBadRsnMonth",
+            label: getLabel("tchBadRsnMonth"),
+            type: "input",
+            inputType: "number"
+        },
+        {
+            key: "bhkDate",
+            label: getLabel("bhkDate"),
+            type: "input"
+        },
+        {
+            key: "badRsn",
+            label: getLabel("badRsn"),
+            type: "input"
+        },
+        {
+            key: "version",
+            label: getLabel("version"),
+            type: "selector",
+            selectInputProp: {
+                placeHolder: "请选择版本号",
+                optionList: [
+                    {
+                        label: "V1",
+                        value: "v1"
+                    },
+                    {
+                        label: "V2",
+                        value: "v2"
+                    }
+                ]
+            }
+        }
+    ]
+
+    return (
+        <form
+            onSubmit={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                form.handleSubmit()
+            }}
+        >
+            <div
+                className="px-2 py-2"
+            >
+                <div
+                    className="grid grid-cols-6 gap-x-2 gap-y-1"
+                >
+                    {
+                        tableSchemaList.map(tableSchema => {
+                            return (
+                                <form.Field
+                                    name={tableSchema.key}
+                                    validators={{
+                                        onChange: ({ value }) =>
+                                            !value
+                                                ? '不能为空'
+                                                : undefined
+                                    }}
+                                    children={(field) => {
+                                        const fieldEmpty = field.state.meta.errors.length > 0
+
+                                        const className = clsx({
+                                            'border-red-700': fieldEmpty,
+                                        })
+
+                                        return (
+                                            <TableInputCol
+                                                tableSchema={tableSchema}
+                                                className={className}
+                                                value={field.state.value}
+                                                onBlur={field.handleBlur}
+                                                onChange={(e) => field.handleChange(e.target.value)}
+                                            // @ts-ignore
+                                            // value={123}
+                                            />
+                                        )
+                                    }}
+                                />
+                            )
+                        })
+                    }
+                </div>
+                <div
+                    className="h-[--box-footer-height] flex justify-end items-center"
+                >
+                    <ButtonInTable>
+                        录入
+                    </ButtonInTable>
+                </div>
+            </div>
+        </form>
+    )
+}
 
 interface RowProp extends DivProp {
     children: Array<ReactNode>

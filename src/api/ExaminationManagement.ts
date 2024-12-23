@@ -3,10 +3,13 @@ import config from "./config";
 const baseURL = config.apiBaseUrl;
 
 export interface ExaminationInfo {
-  id: number;
   itemCode: string;
   itemName: string;
+  defaultValue: string | undefined;
+  bodyPart: Array<string>;
 }
+
+export type ExaminationInfoKey = keyof ExaminationInfo;
 
 interface RetrieveExaminationLisRst {
   code: number;
@@ -26,6 +29,7 @@ export namespace ExaminationManagement {
     });
 
     let requestResult: RetrieveExaminationLisRst = await response.json();
+
     return requestResult;
   };
 }

@@ -17,53 +17,6 @@ export const CustomInputCell = ({
     children,
     ...prop
 }: InputProp) => {
-    // let SpecifiedInput = () => {
-    //     return (
-    //         <Input
-    //             type="text" placeholder="请输入..."
-    //             style={{
-    //                 fontSize: "12px",
-    //             }}
-    //             className="px-2 h-[30px] focus-visible:ring-1 ring-[#2da5b4]"
-    //         />
-    //     )
-    // }
-
-    // switch (type) {
-    //     case "text": {
-    //         // do nothing here
-    //         break
-    //     }
-    //     case "date": {
-    //         SpecifiedInput = () => {
-    //             return (
-    //                 <CustomCalendar />
-    //             )
-    //         }
-    //         break
-    //     }
-    //     case "dateRange": {
-    //         const dateRange = value as DateRangeOfQuery
-    //         console.log(dateRange)
-    //         SpecifiedInput = () => {
-    //             return (
-    //                 <DatePickerWithRange
-    //                     value={dateRange}
-    //                     updateData={(value: DateRangeOfQuery) => {
-    //                         alert(value)
-    //                     }}
-    //                     onBlur={prop.onBlur}
-    //                     className={prop.className}
-    //                 />
-    //             )
-    //         }
-    //         break
-    //     }
-    //     default: {
-
-    //     }
-    // }
-
     return (
         <div
             style={{

@@ -24,6 +24,8 @@ export interface PatientInfo {
   updateTime: string;
 }
 
+export type PatientInfoKey = keyof PatientInfo;
+
 interface PropOfFetchPatientListOfPage {
   pageNumber: number;
   pageSize: number;
@@ -62,7 +64,7 @@ interface FetchPatientInfoByBHKCodeResult {
   data: PatinetInfoWithExaminationResult;
 }
 
-export namespace RetrievePatient {
+export namespace PatientService {
   export const getPatientListOfPage = async ({
     pageNumber,
     pageSize,

@@ -3,6 +3,7 @@ import { createContext, ReactNode, useCallback, useContext, useState } from "rea
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react";
+import "./style/editorBox.css"
 
 const DialogContext = createContext<{
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -85,12 +86,12 @@ const BaseDialogContentWrapper = ({
                 minWidth: "1000px"
             }}
 
-            onPointerDownOutside={
-                () => {
-                    // event.preventDefault()
-                    setOpen(false)
-                }
-            }
+            // onPointerDownOutside={
+            //     () => {
+            //         // event.preventDefault()
+            //         setOpen(false)
+            //     }
+            // }
 
             onOpenAutoFocus={
                 (event) => {
@@ -141,6 +142,7 @@ export const DialogWrapper = ({
     return (
         <Dialog
             open={open}
+            modal={false}
         >
             <DialogContext.Provider value={value} >
                 <BaseDialogTrigger />

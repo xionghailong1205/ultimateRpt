@@ -18,7 +18,7 @@ const CalendarUsedInDialog = () => {
 
     return (
         <Popover
-            modal={true}
+            // modal={true}
             open={open}
             onOpenChange={(open) => {
                 setHasPopOverOpen(open)
@@ -65,6 +65,10 @@ const CalendarUsedInDialog = () => {
                         date > new Date() || date < new Date("1900-01-01")
                     }
                     initialFocus
+                    onDayClick={() => {
+                        setOpen(false)
+                        setHasPopOverOpen(false)
+                    }}
                 />
             </PopoverContent>
         </Popover>

@@ -47,6 +47,7 @@
     --examination-item-height: calc(
       100% - var(--personal-info-height) - var(--history-result-height)
     );
+    --table-input-height: 30px;
   }
 
   .dark {
