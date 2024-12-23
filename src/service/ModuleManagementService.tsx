@@ -1,36 +1,40 @@
 import { ExaminationInfo, ExaminationManagement } from "@/api/ExaminationManagement";
 import { handleAuthenticationFailure } from "@/api/utils/handleAuthenticationFailure";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { ReactFormExtendedApi, useForm } from "@tanstack/react-form";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 type ExaminationItemListStatus = "querying" | "AfterQuerying"
 
 type EditorBoxStatus = "nothing" | "editingExamination" | "editingDisease" | "viewingExamination" | "viewingDisease"
 
 interface ModuleManagementServiceContextProp {
-    selectedItemCode: string | undefined;
+    selectedItemId: number | undefined;
+    selectedDiseaseCode: string | undefined;
     examinationItemList: Array<ExaminationInfo>;
     initExaminationItemList: Function;
     examinationItemListStatus: ExaminationItemListStatus;
     editorBoxStatus: EditorBoxStatus;
-    examinationInfoOfEditorBox: ExaminationInfoOfEditorBox;
     changeEditorBoxStatus: (newStatus: EditorBoxStatus) => void;
     isViewing: () => boolean;
     // 进行查看和编辑检查项目的接口
-    viewExaminationItemInfo: (itemCode: string) => void
-    editExaminationItemInfo: (itemCode: string) => void
+    viewExaminationItemInfo: (itemId: number) => void
+    editExaminationItemInfo: () => void
     // 进行查看和编辑疾病的接口
     viewDiseaseInfo: (itemCode: string) => void
-    // editExaminationItemInfo: (itemCode: string) => void
+    // TODO
+    examinationInfoOfEditorBox: ExaminationInfoOfEditorBox
 }
 
 const ExaminationServiceContext = createContext<ModuleManagementServiceContextProp>(null!)
 
-interface ExaminationInfoOfEditorBox {
+export interface ExaminationInfoOfEditorBox {
     itemCode: string,
     itemName: string,
     bodyPart: string,
     defaultValue: string
 }
+
+export type ExaminationInfoOfEditorBoxKey = keyof ExaminationInfoOfEditorBox;
 
 interface DiseaseInfoOfEditorBox {
     diseaseCode: string;
@@ -47,11 +51,11 @@ export const ModuleManagementServiceProvider = ({
     const [examinationItemList, setExaminationItemList] = useState<Array<ExaminationInfo>>([])
     const [examinationItemListStatus, setExaminationItemListStatus] = useState<ExaminationItemListStatus>("querying")
     const [editorBoxStatus, setEditorBoxStatus] = useState<EditorBoxStatus>("nothing")
-    const [selectedItemCode, setSelectedItemCode] = useState<string | undefined>(undefined)
+    const [selectedItemId, setSelectedItemId] = useState<number | undefined>(undefined)
     const [selectedDiseaseCode, setSelectedDiseaseCode] = useState<string | undefined>(undefined)
 
-    const getEaminationInfoOfEditorBox = () => {
-        if (!selectedItemCode) {
+    const getExaminationInfoOfEditorBox = () => {
+        if (!selectedItemId) {
             return ({
                 itemName: "",
                 itemCode: "",
@@ -61,7 +65,7 @@ export const ModuleManagementServiceProvider = ({
         }
 
         let examinationInfo = examinationItemList.find(examinationInfo => {
-            return examinationInfo.itemCode === selectedItemCode
+            return examinationInfo.id === selectedItemId
         })!
 
         let examinationInfoOfEditorBox: ExaminationInfoOfEditorBox = {
@@ -72,7 +76,18 @@ export const ModuleManagementServiceProvider = ({
         }
 
         return examinationInfoOfEditorBox
+
+        // formForExaminationItem.setFieldValue("itemName", examinationInfoOfEditorBox.itemName)
+        // formForExaminationItem.setFieldValue("itemCode", examinationInfoOfEditorBox.itemCode)
+        // formForExaminationItem.setFieldValue("defaultValue", examinationInfoOfEditorBox.defaultValue)
+        // formForExaminationItem.setFieldValue("bodyPart", examinationInfoOfEditorBox.bodyPart)
     }
+
+    const examinationInfoOfEditorBox = getExaminationInfoOfEditorBox()
+
+    // useEffect(() => {
+    //     getEaminationInfoOfEditorBox()
+    // }, [selectedItemId])
 
     const getDiseaseInfoOfEditorBox = () => {
         let diseaseInfoOfEditorBox: DiseaseInfoOfEditorBox = {
@@ -82,12 +97,12 @@ export const ModuleManagementServiceProvider = ({
             description: ""
         }
 
-        if (!selectedItemCode) {
+        if (!selectedItemId) {
             return diseaseInfoOfEditorBox
         }
 
         let diseaseInfo = examinationItemList.find(examinationInfo => {
-            return examinationInfo.itemCode === selectedItemCode
+            return examinationInfo.itemCode === selectedItemId
         })!
 
         diseaseInfoOfEditorBox = {
@@ -98,7 +113,7 @@ export const ModuleManagementServiceProvider = ({
         }
     }
 
-    const examinationInfoOfEditorBox = getEaminationInfoOfEditorBox()
+    // const examinationInfoOfEditorBox = getEaminationInfoOfEditorBox()
 
     const initExaminationItemList = async () => {
         const requestResult = await ExaminationManagement.RetrieveExaminationList()
@@ -106,6 +121,8 @@ export const ModuleManagementServiceProvider = ({
         const responseCode = requestResult.code
 
         handleAuthenticationFailure(responseCode)
+
+        console.log(requestResult.data)
 
         if (requestResult.code === 200) {
             setExaminationItemList(requestResult.data)
@@ -119,18 +136,19 @@ export const ModuleManagementServiceProvider = ({
         setEditorBoxStatus(newStatus)
     }
 
-    const viewExaminationItemInfo = (itemCode: string) => {
-        setSelectedItemCode(itemCode)
+    const viewExaminationItemInfo = (itemId: number) => {
+        setSelectedItemId(itemId)
+        setSelectedDiseaseCode(undefined)
         changeEditorBoxStatus("viewingExamination")
     }
 
-    const editExaminationItemInfo = (itemCode: string) => {
-        setSelectedItemCode(itemCode)
+    const editExaminationItemInfo = () => {
         setEditorBoxStatus("editingExamination")
     }
 
     const viewDiseaseInfo = (diseaseCode: string) => {
-        console.log(diseaseCode)
+        setSelectedItemId(undefined)
+        setSelectedDiseaseCode(diseaseCode)
         setEditorBoxStatus("viewingDisease")
     }
 
@@ -143,17 +161,19 @@ export const ModuleManagementServiceProvider = ({
     }
 
     const value: ModuleManagementServiceContextProp = {
-        selectedItemCode,
+        selectedItemId: selectedItemId,
         examinationItemList,
         initExaminationItemList,
         examinationItemListStatus,
         editorBoxStatus,
         changeEditorBoxStatus,
-        examinationInfoOfEditorBox,
+        // examinationInfoOfEditorBox,
         viewExaminationItemInfo,
         editExaminationItemInfo,
         isViewing,
-        viewDiseaseInfo
+        viewDiseaseInfo,
+        selectedDiseaseCode,
+        examinationInfoOfEditorBox
     }
 
     return (

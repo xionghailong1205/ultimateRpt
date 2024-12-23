@@ -19,6 +19,7 @@ import { DivProp } from '@/View/type'
 const CollapsibleExaminationItem = (examinationInfo: ExaminationInfo) => {
     const {
         itemName,
+        id: itemId,
         itemCode
     } = examinationInfo
 
@@ -52,11 +53,11 @@ const CollapsibleExaminationItem = (examinationInfo: ExaminationInfo) => {
     } = useModuleManagementService()
 
     // 判断是否被选中
-    const { selectedItemCode } = useModuleManagementService()
-    const isActiving = selectedItemCode === itemCode
+    const { selectedItemId } = useModuleManagementService()
+    const isItemSelected = selectedItemId === itemId
 
-    const className = clsx({
-        'text-[--theme-fore-color]': isActiving,
+    const itemSelectedStyle = clsx({
+        'text-[--theme-fore-color]': isItemSelected,
     })
 
     // 判断体检项目下是否有疾病
@@ -73,7 +74,7 @@ const CollapsibleExaminationItem = (examinationInfo: ExaminationInfo) => {
             <div>
                 <CollapsibleTrigger asChild>
                     <div
-                        className={cn("py-2 px-1 text-[12px] cursor-pointer flex items-center gap-1", className)}
+                        className={cn("py-2 px-1 text-[12px] cursor-pointer flex items-center gap-1", itemSelectedStyle)}
                     >
                         <div
                             className='w-4 h-4'
@@ -96,7 +97,7 @@ const CollapsibleExaminationItem = (examinationInfo: ExaminationInfo) => {
                         <div
                             className={'select-none'}
                             onClick={() => {
-                                viewExaminationItemInfo(itemCode)
+                                viewExaminationItemInfo(itemId)
                             }}
                         >
                             {itemName}
@@ -107,12 +108,23 @@ const CollapsibleExaminationItem = (examinationInfo: ExaminationInfo) => {
             <CollapsibleContent className="space-y-2">
                 {
                     diseaseList.map(diseaseInfo => {
+                        const {
+                            selectedDiseaseCode
+                        } = useModuleManagementService()
+
+                        const isItemSelected = selectedDiseaseCode === diseaseInfo.diseaseCode
+
+                        const diseaseSelectedStyle = clsx({
+                            'text-[--theme-fore-color]': isItemSelected,
+                        })
+
                         return (
                             <DiseaseBox
                                 DiseaseName={diseaseInfo.name}
                                 onClick={() => {
                                     viewDiseaseInfo(diseaseInfo.diseaseCode)
                                 }}
+                                className={diseaseSelectedStyle}
                             />
                         )
                     })
@@ -135,7 +147,7 @@ const DiseaseBox = ({
     return (
         <div
             {...prop}
-            className=' px-6 select-none cursor-pointer'
+            className={cn('px-6 select-none cursor-pointer', prop.className)}
         >
             {DiseaseName}
         </div>

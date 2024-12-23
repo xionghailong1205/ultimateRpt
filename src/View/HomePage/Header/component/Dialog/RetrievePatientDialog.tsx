@@ -7,6 +7,13 @@ import Pagination from "./component/Pagination"
 import { ResultTable } from "./component/ResultTable"
 import { Button } from "@/components/ui/button"
 import { DialogWrapper } from "./BaseDialogWrapper"
+import ButtonInTable from "@/components/StyledComponent/ButtonInTable"
+import { TableInputCol, TableSchema } from "@/service/TableService/TableService"
+import { KeyForPatientRetrieve } from "@/api/PatientService"
+import { Key2LabelService } from "@/map/key2LabelService"
+import { VerificationHelper } from "@/service/VerificationHelper"
+import clsx from "clsx"
+import { FieldValidContext, FieldValidContextProp } from "@/service/FieldValidService"
 
 const RetrievePatientDialog = () => {
     return (
@@ -47,6 +54,46 @@ const QueryForm = () => {
         form
     } = useRetrievePatientService()
 
+    const getLabel = Key2LabelService.getLabel
+
+    const tableSchemaList: Array<TableSchema<KeyForPatientRetrieve>> = [
+        {
+            key: "personName",
+            label: getLabel("personName"),
+            type: "input",
+        },
+        {
+            key: "bhkCode",
+            label: getLabel("bhkCode"),
+            type: "input",
+        },
+        {
+            key: "sex",
+            label: getLabel("sex"),
+            type: "input",
+        },
+        {
+            key: "age",
+            label: getLabel("age"),
+            type: "input",
+        },
+        {
+            key: "idc",
+            label: getLabel("idc"),
+            type: "input",
+        },
+        {
+            key: "bhkDate",
+            label: getLabel("bhkDate"),
+            type: "input",
+        },
+        {
+            key: "crptName",
+            label: getLabel("crptName"),
+            type: "input",
+        }
+    ]
+
     return (
         <form
             onSubmit={(e) => {
@@ -56,118 +103,68 @@ const QueryForm = () => {
             }}
             className="queryForm"
         >
-            <Row
-                style={{
-                    gap: "20px"
-                }}
-            >
-                <CustomInputCell
-                    label="体检人员ID:"
-                    containerWidth={210}
-                    inputWidth={120}
-                >
-                    <CustomInput />
-                </CustomInputCell>
-                <CustomInputCell
-                    label="人员姓名:"
-                    containerWidth={210}
-                    inputWidth={120}
-                >
-                    <CustomInput />
-                </CustomInputCell>
-                <CustomInputCell
-                    label="体检编号:"
-                    containerWidth={210}
-                    inputWidth={120}
-                >
-                    <CustomInput />
-                </CustomInputCell>
-                <CustomInputCell
-                    label="体检日期:"
-                    containerWidth={210}
-                    inputWidth={140}
-                >
-                    <CalendarUsedInDialog />
-                </CustomInputCell>
-            </Row>
-            <Row
-                style={{
-                    gap: "20px"
-                }}
-            >
-                <CustomInputCell
-                    label="版本:"
-                    containerWidth={130}
-                    inputWidth={80}
-                >
-                    <CustomInput />
-                </CustomInputCell>
-                <CustomInputCell
-                    label="单位社会信用代码:"
-                    containerWidth={250}
-                    inputWidth={120}
-                >
-                    <CustomInput />
-                </CustomInputCell>
-                <CustomInputCell
-                    label="单位名称:"
-                    containerWidth={200}
-                    inputWidth={120}
-                >
-                    <CustomInput />
-                </CustomInputCell>
-                <CustomInputCell
-                    label="性别:"
-                    containerWidth={130}
-                    inputWidth={90}
-                >
-                    <CustomInput />
-                </CustomInputCell>
-            </Row>
-            <Row
-                style={{
-                    gap: "20px",
-                    display: "flex",
-                    justifyContent: "space-between"
-                }}
+            <div
+                className="px-2 py-2"
             >
                 <div
-                    style={{
-                        display: "flex",
-                        gap: "10px"
-                    }}
+                    className="grid grid-cols-6 gap-x-2 gap-y-1"
                 >
-                    <CustomInputCell
-                        label="生日:"
-                        containerWidth={190}
-                        inputWidth={150}
-                    >
-                        <CalendarUsedInDialog />
-                    </CustomInputCell>
-                    <CustomInputCell
-                        label="年龄:"
-                        containerWidth={130}
-                        inputWidth={80}
-                    >
-                        <CustomInput />
-                    </CustomInputCell>
+                    {
+                        tableSchemaList.map(tableSchema => {
+                            return (
+                                <form.Field
+                                    name={tableSchema.key}
+                                    validators={{
+                                        onChange: ({ value }) => {
+                                            if (!tableSchema.validFnc) {
+                                                return undefined
+                                            }
+                                            return tableSchema.validFnc(value)
+                                        }
+                                    }}
+                                    children={(field) => {
+                                        const inValid = field.state.meta.errors.length > 0
+
+                                        const value: FieldValidContextProp = {
+                                            handleChange: (value: string) => {
+                                                field.handleChange(value)
+                                            },
+                                            handleBlur: field.handleBlur,
+                                            fieldValue: String(field.state.value),
+                                            inValid
+                                        }
+
+                                        return (
+                                            <FieldValidContext.Provider
+                                                value={value}
+                                            >
+                                                <TableInputCol
+                                                    tableSchema={tableSchema}
+                                                />
+                                            </FieldValidContext.Provider>
+                                        )
+                                    }}
+                                />
+                            )
+                        })
+                    }
                 </div>
-                <form.Subscribe
-                    selector={(state) => [state.canSubmit, state.isSubmitting]}
-                    children={([canSubmit, isSubmitting]) => (
-                        <Button
-                            type="submit"
-                            disabled={!canSubmit}
-                            className="h-[--queryForm-row-height] bg-[--theme-fore-color] hover:bg-[--theme-fore-color-hover]"
-                            style={{
-                                fontSize: "var(--global-font-size)"
-                            }}
-                        >
-                            {isSubmitting ? '查询中' : '查询'}
-                        </Button>
-                    )}
-                />
-            </Row>
+                <div
+                    className="h-[--box-footer-height] flex justify-end items-center pt-3"
+                >
+                    <form.Subscribe
+                        selector={(state) => [state.canSubmit, state.isSubmitting]}
+                        children={([canSubmit, isSubmitting]) => (
+                            <ButtonInTable
+                                type="submit"
+                                disabled={!canSubmit}
+                            >
+                                {isSubmitting ? '查询中' : '查询'}
+                            </ButtonInTable>
+                        )}
+                    />
+                </div>
+            </div>
         </form>
     )
 }

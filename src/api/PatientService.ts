@@ -64,6 +64,18 @@ interface FetchPatientInfoByBHKCodeResult {
   data: PatinetInfoWithExaminationResult;
 }
 
+export interface OptionalPropForRetrievePatientList {
+  personName: string;
+  bhkCode: string;
+  sex: string;
+  age: string;
+  idc: string;
+  bhkDate: string;
+  crptName: string;
+}
+
+export type KeyForPatientRetrieve = keyof OptionalPropForRetrievePatientList;
+
 export namespace PatientService {
   export const getPatientListOfPage = async ({
     pageNumber,

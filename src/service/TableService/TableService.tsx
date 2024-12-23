@@ -1,8 +1,9 @@
 import NormalInput from "@/components/Inputer/NormalInput";
+import RstInput from "@/components/Inputer/RstInput";
 import { SelectInput, SelectInputProp } from "@/components/Inputer/SelectInput";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { DivProp, InputProp } from "@/View/type";
+import { InputProp } from "@/View/type";
 
 export interface TableSchema<T> {
     key: T;
@@ -10,7 +11,7 @@ export interface TableSchema<T> {
     type: InputType;
     selectInputProp?: SelectInputProp;
     inputType?: React.HTMLInputTypeAttribute;
-    validFnc?: (value: string | undefined) => string | undefined
+    validFnc?: (value: any) => string | undefined
 }
 
 const getInputSpanInTable = (type: InputType): string => {
@@ -26,6 +27,9 @@ const getInputSpanInTable = (type: InputType): string => {
         }
         case "subTitle": {
             return "1 / span 6"
+        }
+        case "readOnly": {
+            return "span 2";
         }
     }
 };
@@ -44,10 +48,13 @@ const getInputHeight = (type: InputType): string => {
         case "subTitle": {
             return "h-[--textare-input-height]";
         }
+        case "readOnly": {
+            return "h-[--normal-input-height]";
+        }
     }
 };
 
-export type InputType = "input" | "selector" | "textarea" | "subTitle";
+type InputType = "input" | "selector" | "textarea" | "subTitle" | "readOnly";
 
 interface TableInputProp extends InputProp {
     type: InputType
@@ -85,21 +92,14 @@ export const TableInput = ({
                 <SelectInput
                     optionList={selectInputProp.optionList}
                     placeHolder={selectInputProp.placeHolder}
-                // onChange={(newValue) => {
-                //     prop
-                // }}
                 />
             )
         }
-        // case "subTitle": {
-        //     return (
-        //         <div
-        //             {...prop}
-        //         >
-        //             {prop.value}
-        //         </div>
-        //     )
-        // }
+        case "readOnly": {
+            return (
+                <RstInput />
+            )
+        }
     }
 }
 

@@ -74,7 +74,7 @@ export let RightBodyPartMap = new Map<string, BodyPartInfo>([
     },
   ],
   [
-    "leftBreast",
+    "rightBreast",
     {
       labelName: "右乳腺",
       imgName: "breast_right",

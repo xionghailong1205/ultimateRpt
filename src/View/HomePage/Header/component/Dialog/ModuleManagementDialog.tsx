@@ -1,20 +1,22 @@
 import { useEffect } from "react"
 import { DivProp } from "@/View/type"
 import { DialogWrapper } from "./BaseDialogWrapper"
-import { ExaminationInfoKey, ExaminationManagement } from "@/api/ExaminationManagement"
+import { ExaminationManagement } from "@/api/ExaminationManagement"
 import { cn } from "@/lib/utils"
-import { ModuleManagementServiceProvider, useModuleManagementService } from "@/service/ModuleManagementService"
+import { ExaminationInfoOfEditorBox, ExaminationInfoOfEditorBoxKey, ModuleManagementServiceProvider, useModuleManagementService } from "@/service/ModuleManagementService"
 import { PlusIcon } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import CollapsibleExaminationItem from "./component/CollapsibleExaminationItem"
-import { Label } from "@/components/ui/label"
-import NormalInput from "@/components/Inputer/NormalInput"
-import { SelectInput } from "@/components/Inputer/SelectInput"
-import RstInput from "@/components/Inputer/RstInput"
 import ButtonInTable from "@/components/StyledComponent/ButtonInTable"
 import { DiseaseInfoKey } from "@/api/DiseaseManagement"
 import { Key2LabelService } from "@/map/key2LabelService"
-import { InputType, TableSchema, TableSchemaService } from "@/service/TableSchemaService"
+import { TableInputCol, TableSchema } from "@/service/TableService/TableService"
+import { FieldValidContext, FieldValidContextProp } from "@/service/FieldValidService"
+import clsx from "clsx"
+import { BodyPartService } from "@/service/BodyPartService"
+import { VerificationHelper } from "@/service/VerificationHelper"
+import { useForm } from "@tanstack/react-form"
+// import { InputType, TableSchema, TableSchemaService } from "@/service/TableService/EntryPatientTableService"
 
 const ModuleManagementDialog = () => {
     return (
@@ -96,9 +98,7 @@ const EditorBoxContent = () => {
         }
         case "editingExamination": {
             return (
-                <div>
-                    编辑体检项目的信息
-                </div>
+                <EditingExaminationItemTable />
             )
         }
         case "editingDisease":
@@ -152,61 +152,123 @@ const OperatingBox = () => {
     )
 }
 
-interface DiseaseTableSchema extends TableSchema<DiseaseInfoKey> { }
-
-const getLabel = Key2LabelService.getLabel
-
 const ExaminationItemTable = () => {
+    const {
+        examinationInfoOfEditorBox,
+        isViewing,
+        editExaminationItemInfo,
+        editorBoxStatus
+    } = useModuleManagementService()
+
+    const getLabel = Key2LabelService.getLabel
+    const makeSureNotEmpty = VerificationHelper.makeSureNotEmpty
+
     // 简单的 schema driver layoute
-    const tableSchemaList: Array<TableSchema<ExaminationInfoKey>> = [
+    const tableSchemaList: Array<TableSchema<ExaminationInfoOfEditorBoxKey>> = [
         {
             key: "itemCode",
             label: getLabel("itemCode"),
-            type: "input"
+            type: "input",
+            validFnc: makeSureNotEmpty
         },
         {
             key: "itemName",
             label: getLabel("itemName"),
-            type: "input"
+            type: "input",
+            validFnc: makeSureNotEmpty
         },
         {
             key: "defaultValue",
             label: getLabel("defaultValue"),
-            type: "input"
+            type: "input",
+            validFnc: makeSureNotEmpty
         },
         {
             key: "bodyPart",
             label: getLabel("bodyPart"),
-            type: "selector"
+            type: "selector",
+            selectInputProp: {
+                placeHolder: "请选择关联身体部位",
+                optionList: [...BodyPartService.getBodyPartOptionList()]
+            },
+            validFnc: makeSureNotEmpty
         }
     ]
 
-    const {
-        examinationInfoOfEditorBox
-    } = useModuleManagementService()
+    const form = useForm<ExaminationInfoOfEditorBox, undefined>({
+        defaultValues: examinationInfoOfEditorBox,
+        onSubmit: async ({ value }) => {
+            alert("执行更改操作")
+        }
+    })
 
     return (
-        <div
+        <form
+            onSubmit={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                form.handleSubmit()
+            }}
+
             className="editor-box w-full h-full px-3 border"
         >
             <div
                 className="text-[20px] text-[--theme-fore-color] font-bold h-[--box-header-height] flex items-center"
             >
-                查看检查项目
+                {isViewing() ? "查看检查项目" : "编辑检查项目"}
             </div>
             <div
                 className="h-[--box-content-height]"
             >
                 <div
-                    className="grid grid-cols-2 gap-x-2 gap-y-1"
+                    className="grid grid-cols-4 gap-x-2 gap-y-1"
                 >
                     {
                         tableSchemaList.map(tableSchema => {
                             return (
-                                <TableInputCol
-                                    tableSchema={tableSchema}
-                                    // @ts-ignore
-                                    value={examinationInfoOfEditorBox[tableSchema.key]}
+                                <form.Field
+                                    name={tableSchema.key}
+                                    validators={{
+                                        onChange: ({ value }) => {
+                                            console.log(value)
+
+                                            if (!tableSchema.validFnc) {
+                                                return undefined
+                                            }
+
+                                            console.log(tableSchema.validFnc(value))
+
+                                            return tableSchema.validFnc(value)
+                                        }
+                                    }}
+                                    children={(field) => {
+                                        const inValid = field.state.meta.errors.length > 0
+
+                                        console.log(inValid)
+
+                                        const value: FieldValidContextProp = {
+                                            handleChange: (value: string) => {
+                                                field.handleChange(value)
+                                            },
+                                            handleBlur: field.handleBlur,
+                                            fieldValue: field.state.value,
+                                            inValid
+                                        }
+
+                                        if (isViewing()) {
+                                            tableSchema.type = "readOnly"
+                                        }
+
+                                        return (
+                                            <FieldValidContext.Provider
+                                                value={value}
+                                            >
+                                                <TableInputCol
+                                                    tableSchema={tableSchema}
+                                                />
+                                            </FieldValidContext.Provider>
+                                        )
+                                    }}
                                 />
                             )
                         })
@@ -216,16 +278,39 @@ const ExaminationItemTable = () => {
             <div
                 className="h-[--box-footer-height] flex justify-end items-center"
             >
-                <ButtonInTable>
-                    进行编辑
-                </ButtonInTable>
+                {
+                    editorBoxStatus === "viewingExamination" ? (
+                        <ButtonInTable
+                            type="button"
+                            onClick={() => {
+                                editExaminationItemInfo()
+                            }}
+                        >
+                            进行编辑
+                        </ButtonInTable>
+                    ) : (
+                        <form.Subscribe
+                            selector={(state) => [state.canSubmit, state.isSubmitting]}
+                            children={([canSubmit, isSubmitting]) => (
+                                <ButtonInTable
+                                    type="submit"
+                                    disabled={!canSubmit}
+                                >
+                                    {isSubmitting ? '保存中' : '保存更改'}
+                                </ButtonInTable>
+                            )}
+                        />
+                    )
+                }
             </div>
-        </div>
+        </form>
     )
 }
 
 const DiseaseTable = () => {
-    const tableSchemaList: Array<DiseaseTableSchema> = [
+    const getLabel = Key2LabelService.getLabel
+
+    const tableSchemaList: Array<TableSchema<DiseaseInfoKey>> = [
         {
             key: "diseaseCode",
             label: getLabel("diseaseCode"),
@@ -280,7 +365,11 @@ const DiseaseTable = () => {
             <div
                 className="h-[--box-footer-height] flex justify-end items-center"
             >
-                <ButtonInTable>
+                <ButtonInTable
+                    onClick={() => {
+                        // 之后实现代码
+                    }}
+                >
                     进行编辑
                 </ButtonInTable>
             </div>
@@ -288,78 +377,13 @@ const DiseaseTable = () => {
     )
 }
 
-const TableInputCol = ({
-    tableSchema,
-    value
-}: {
-    tableSchema: TableSchema<string>
-    value: string
-}) => {
+const ViewingExaminationItemTable = () => {
     return (
-        <div
-            className="flex flex-col gap-0.5 flex-1"
-            style={{
-                gridColumn: TableSchemaService.getInputSpanInTable(tableSchema.type)
-            }}
-        >
-            <Label
-                className="text-[--theme-fore-color] text-[13px]"
-            >
-                {tableSchema.label}
-            </Label>
-            <div
-                className={TableSchemaService.getInputHeight(tableSchema.type)}
-            >
-                <TableInput
-                    type={tableSchema.type}
-                    key={tableSchema.key}
-                    value={value}
-                />
-            </div>
-        </div>
+        <ExaminationItemTable />
     )
 }
 
-const TableInput = ({
-    type,
-    key,
-    value
-}: {
-    type: InputType
-    key: string
-    value: string
-}) => {
-    const {
-        isViewing
-    } = useModuleManagementService()
-
-    const viewing = isViewing()
-
-    console.log(key, value)
-
-    if (viewing) {
-        return (
-            <RstInput
-                value={value}
-            />
-        )
-    }
-
-    switch (type) {
-        case "input": {
-            return (
-                <NormalInput />
-            )
-        }
-        case "selector": {
-            return (
-                <SelectInput />
-            )
-        }
-    }
-}
-
-const ViewingExaminationItemTable = () => {
+const EditingExaminationItemTable = () => {
     return (
         <ExaminationItemTable />
     )

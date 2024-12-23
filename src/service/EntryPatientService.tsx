@@ -106,20 +106,27 @@ export const EntryPatientProvider = ({
                     setResultTableState("noResultAfterQuerying")
                 }
             }
+        },
+        defaultState: {
+            canSubmit: false
         }
     })
 
     const formForEntryPatient = useForm<PropForPatientEntry, undefined>({
         defaultValues: {
-            personName: "nihao",
+            personName: "",
             bhkCode: "",
             bhkDate: "",
             version: "v1"
+        },
+        defaultState: {
+            canSubmit: false,
         },
         onSubmit: async ({ value }) => {
             alert("之后执行逻辑")
         }
     })
+
 
     const value = {
         resultTableState,

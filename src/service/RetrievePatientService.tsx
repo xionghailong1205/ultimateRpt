@@ -1,16 +1,12 @@
-import { PatientInfo, PatientService } from "@/api/PatientService";
+import { OptionalPropForRetrievePatientList, PatientInfo, PatientService } from "@/api/PatientService";
 import { handleAuthenticationFailure } from "@/api/utils/handleAuthenticationFailure";
 import { ResultTableState } from "@/View/HomePage/Header/component/Dialog/component/ResultTable";
 import { DialogTableProp } from "@/View/HomePage/Header/component/Dialog/Type";
 import { ReactFormExtendedApi, useForm } from "@tanstack/react-form";
 import { createContext, ReactNode, useContext, useState } from "react";
 
-interface RetrievePatientServiceAPIProp {
-    id: string
-}
-
-interface RetrievePatientServiceContext extends DialogTableProp<PatientInfo> {
-    form: ReactFormExtendedApi<RetrievePatientServiceAPIProp, undefined>;
+interface RetrievePatientServiceContext extends DialogTableProp<PatientTableRowDataProp> {
+    form: ReactFormExtendedApi<OptionalPropForRetrievePatientList, undefined>;
 }
 
 const RetrievePatientContext = createContext<RetrievePatientServiceContext>(null!);
@@ -89,9 +85,15 @@ export const RetrievePatientProvider = ({ children }: {
         alert("尚未实现")
     }
 
-    const form = useForm<RetrievePatientServiceAPIProp, undefined>({
+    const form = useForm<OptionalPropForRetrievePatientList, undefined>({
         defaultValues: {
-            id: ''
+            bhkCode: "",
+            personName: "",
+            sex: "",
+            age: "",
+            idc: "",
+            bhkDate: "",
+            crptName: ""
         },
         onSubmit: async ({ value }) => {
             setCurrentPage(1)

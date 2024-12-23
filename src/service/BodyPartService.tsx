@@ -1,7 +1,7 @@
 import { LeftBodyPartMap, RightBodyPartMap } from "@/map/BodyPartMap"
 
 export interface BodyPartBoxProp {
-    keyValue: string,
+    value: string,
     label: string
 }
 
@@ -11,7 +11,7 @@ export namespace BodyPartService {
 
         for (const [key, value] of LeftBodyPartMap) {
             bodyPartList.push({
-                keyValue: key,
+                value: key,
                 label: value.labelName
             })
         }
@@ -24,11 +24,18 @@ export namespace BodyPartService {
 
         for (const [key, value] of RightBodyPartMap) {
             bodyPartList.push({
-                keyValue: key,
+                value: key,
                 label: value.labelName
             })
         }
 
         return bodyPartList
+    }
+
+    export const getBodyPartOptionList = (): Array<BodyPartBoxProp> => {
+        return ([
+            ...getLeftBodyPartList(),
+            ...getRightBodyPartList()
+        ])
     }
 }

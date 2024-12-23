@@ -19,6 +19,8 @@ import { Key2LabelService } from "@/map/key2LabelService"
 import { TableInputCol, TableSchema } from "@/service/TableService/EntryPatientTableService"
 import { KeyForPatientEntry } from "@/api/EntryPatient"
 import ButtonInTable from "@/components/StyledComponent/ButtonInTable"
+import { VerificationHelper } from "@/service/VerificationHelper"
+import { FieldValidContext, FieldValidContextProp } from "@/service/FieldValidService"
 
 const EntryPatientDialog = () => {
     return (
@@ -120,26 +122,65 @@ const ManualEntryTable = () => {
 
     const getLabel = Key2LabelService.getLabel
 
-    const tableSchemaList: Array<TableSchema<KeyForPatientEntry>> = [
+    const makeSureNotEmpty = VerificationHelper.makeSureNotEmpty
+
+    const tableSchemaList: Array<TableSchema<KeyForPatientEntry | "need" | "optional">> = [
+        {
+            key: "need",
+            label: "必填字段",
+            type: "subTitle"
+        },
         {
             key: "personName",
             label: getLabel("personName"),
-            type: "input"
+            type: "input",
+            validFnc: makeSureNotEmpty
         },
         {
             key: "bhkCode",
             label: getLabel("bhkCode"),
-            type: "input"
+            type: "input",
+            validFnc: makeSureNotEmpty
+        },
+        {
+            key: "bhkDate",
+            label: getLabel("bhkDate"),
+            type: "input",
+            validFnc: makeSureNotEmpty
+        },
+        {
+            key: "version",
+            label: getLabel("version"),
+            type: "selector",
+            selectInputProp: {
+                placeHolder: "请选择版本号",
+                optionList: [
+                    {
+                        label: "V1",
+                        value: "v1"
+                    },
+                    {
+                        label: "V2",
+                        value: "v2"
+                    }
+                ]
+            },
+            validFnc: makeSureNotEmpty
+        },
+        {
+            key: "optional",
+            label: "可选字段",
+            type: "subTitle"
         },
         {
             key: "institutionCode",
             label: getLabel("institutionCode"),
-            type: "input"
+            type: "input",
         },
         {
             key: "sex",
             label: getLabel("sex"),
-            type: "input"
+            type: "input",
         },
         {
             key: "idc",
@@ -149,13 +190,13 @@ const ManualEntryTable = () => {
         {
             key: "brth",
             label: getLabel("brth"),
-            type: "input"
+            type: "input",
         },
         {
             key: "age",
             label: getLabel("age"),
             type: "input",
-            inputType: "number"
+            inputType: "number",
         },
         {
             key: "isXrMd",
@@ -179,59 +220,36 @@ const ManualEntryTable = () => {
             key: "lnkTel",
             label: getLabel("lnkTel"),
             type: "input",
-            inputType: "tel"
+            inputType: "tel",
         },
         {
             key: "wrkLnt",
             label: getLabel("wrkLnt"),
             type: "input",
-            inputType: "number"
+            inputType: "number",
         },
         {
             key: "wrkLntMonth",
             label: getLabel("wrkLntMonth"),
             type: "input",
-            inputType: "number"
+            inputType: "number",
         },
         {
             key: "tchBadRsnTim",
             label: getLabel("tchBadRsnTim"),
             type: "input",
-            inputType: "number"
+            inputType: "number",
         },
         {
             key: "tchBadRsnMonth",
             label: getLabel("tchBadRsnMonth"),
             type: "input",
-            inputType: "number"
-        },
-        {
-            key: "bhkDate",
-            label: getLabel("bhkDate"),
-            type: "input"
+            inputType: "number",
         },
         {
             key: "badRsn",
             label: getLabel("badRsn"),
-            type: "input"
-        },
-        {
-            key: "version",
-            label: getLabel("version"),
-            type: "selector",
-            selectInputProp: {
-                placeHolder: "请选择版本号",
-                optionList: [
-                    {
-                        label: "V1",
-                        value: "v1"
-                    },
-                    {
-                        label: "V2",
-                        value: "v2"
-                    }
-                ]
-            }
+            type: "input",
         }
     ]
 
@@ -251,45 +269,70 @@ const ManualEntryTable = () => {
                 >
                     {
                         tableSchemaList.map(tableSchema => {
-                            return (
-                                <form.Field
-                                    name={tableSchema.key}
-                                    validators={{
-                                        onChange: ({ value }) =>
-                                            !value
-                                                ? '不能为空'
-                                                : undefined
-                                    }}
-                                    children={(field) => {
-                                        const fieldEmpty = field.state.meta.errors.length > 0
+                            if (tableSchema.key === "need" || tableSchema.key === "optional") {
+                                return (
+                                    <TableInputCol
+                                        tableSchema={tableSchema}
+                                        className="font-bold"
+                                        value={tableSchema.label}
+                                    />
+                                )
+                            } else {
+                                return (
+                                    <form.Field
+                                        name={tableSchema.key}
+                                        validators={{
+                                            onChange: ({ value }) => {
+                                                console.log(value)
 
-                                        const className = clsx({
-                                            'border-red-700': fieldEmpty,
-                                        })
+                                                if (!tableSchema.validFnc) {
+                                                    return undefined
+                                                }
+                                                return tableSchema.validFnc(value)
+                                            }
+                                        }}
+                                        children={(field) => {
+                                            const inValid = field.state.meta.errors.length > 0
 
-                                        return (
-                                            <TableInputCol
-                                                tableSchema={tableSchema}
-                                                className={className}
-                                                value={field.state.value}
-                                                onBlur={field.handleBlur}
-                                                onChange={(e) => field.handleChange(e.target.value)}
-                                            // @ts-ignore
-                                            // value={123}
-                                            />
-                                        )
-                                    }}
-                                />
-                            )
+                                            const value: FieldValidContextProp = {
+                                                handleChange: (value: string) => {
+                                                    field.handleChange(value)
+                                                },
+                                                handleBlur: field.handleBlur,
+                                                fieldValue: field.state.value,
+                                                inValid
+                                            }
+
+                                            return (
+                                                <FieldValidContext.Provider
+                                                    value={value}
+                                                >
+                                                    <TableInputCol
+                                                        tableSchema={tableSchema}
+                                                    />
+                                                </FieldValidContext.Provider>
+                                            )
+                                        }}
+                                    />
+                                )
+                            }
                         })
                     }
                 </div>
                 <div
-                    className="h-[--box-footer-height] flex justify-end items-center"
+                    className="h-[--box-footer-height] flex justify-end items-center pt-3"
                 >
-                    <ButtonInTable>
-                        录入
-                    </ButtonInTable>
+                    <form.Subscribe
+                        selector={(state) => [state.canSubmit, state.isSubmitting]}
+                        children={([canSubmit, isSubmitting]) => (
+                            <ButtonInTable
+                                type="submit"
+                                disabled={!canSubmit}
+                            >
+                                {isSubmitting ? '导入中' : '导入'}
+                            </ButtonInTable>
+                        )}
+                    />
                 </div>
             </div>
         </form>

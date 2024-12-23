@@ -6,8 +6,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { cn } from "@/lib/utils";
+import { useFieldValidService } from "@/service/FieldValidService";
 import { useDialogContext } from "@/View/HomePage/Header/component/Dialog/BaseDialogWrapper"
-import { DivProp } from "@/View/type"
+import { DivProp, SelectProp } from "@/View/type"
+import clsx from "clsx";
 import { useState } from "react"
 
 interface Option {
@@ -15,7 +18,7 @@ interface Option {
     value: string,
 }
 
-export interface SelectInputProp {
+export interface SelectInputProp extends SelectProp {
     placeHolder: string;
     optionList: Array<Option>;
 }
@@ -29,18 +32,31 @@ export function SelectInput({
         setHasPopOverOpen
     } = useDialogContext()
 
+    const {
+        handleChange,
+        handleBlur,
+        fieldValue,
+        inValid
+    } = useFieldValidService()
+
+    const className = clsx({
+        'ring-1 ring-[#b91c1c]': inValid,
+    })
+
     return (
         <Select
+            value={fieldValue}
             open={open}
             onOpenChange={(open) => {
                 setHasPopOverOpen(open)
             }}
-            onValueChange={() => {
+            onValueChange={(value) => {
+                handleChange(value)
                 setOpen(false)
             }}
         >
             <SelectTrigger
-                className="w-full h-[--table-input-height]"
+                className={cn("w-full h-[--table-input-height]", className)}
                 onClick={() => {
                     setOpen(true)
                 }}
@@ -62,6 +78,8 @@ export function SelectInput({
                 onPointerDownOutside={() => {
                     setOpen(false)
                 }}
+                // @ts-ignore
+                onBlur={handleBlur}
             >
                 <SelectGroup>
                     {
