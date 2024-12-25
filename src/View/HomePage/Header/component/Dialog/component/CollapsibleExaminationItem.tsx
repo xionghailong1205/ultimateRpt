@@ -23,6 +23,11 @@ const CollapsibleExaminationItem = (examinationInfo: ExaminationInfo) => {
         itemCode
     } = examinationInfo
 
+    const {
+        viewExaminationItemInfo,
+        viewDiseaseInfo
+    } = useModuleManagementService()
+
     const [isOpen, setIsOpen] = useState(false)
 
     const [diseaseList, setDiseaseList] = useState<Array<DiseaseInfo>>([])
@@ -37,6 +42,7 @@ const CollapsibleExaminationItem = (examinationInfo: ExaminationInfo) => {
             handleAuthenticationFailure(responseCode)
 
             if (responseCode === 200) {
+                console.log(requestRst)
                 setDiseaseList(requestRst.data)
                 return
             }
@@ -46,11 +52,6 @@ const CollapsibleExaminationItem = (examinationInfo: ExaminationInfo) => {
 
         fetchDiseaseList()
     }, [])
-
-    const {
-        viewExaminationItemInfo,
-        viewDiseaseInfo
-    } = useModuleManagementService()
 
     // 判断是否被选中
     const { selectedItemId } = useModuleManagementService()
@@ -75,10 +76,14 @@ const CollapsibleExaminationItem = (examinationInfo: ExaminationInfo) => {
                 <CollapsibleTrigger asChild>
                     <div
                         className={cn("py-2 px-1 text-[12px] cursor-pointer flex items-center gap-1", itemSelectedStyle)}
+                        onClick={() => {
+                            viewExaminationItemInfo(itemId)
+                        }}
                     >
                         <div
                             className='w-4 h-4'
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.stopPropagation()
                                 setIsOpen((open) => !open)
                             }}
                         >
@@ -96,9 +101,6 @@ const CollapsibleExaminationItem = (examinationInfo: ExaminationInfo) => {
                         </div>
                         <div
                             className={'select-none'}
-                            onClick={() => {
-                                viewExaminationItemInfo(itemId)
-                            }}
                         >
                             {itemName}
                         </div>
@@ -109,10 +111,10 @@ const CollapsibleExaminationItem = (examinationInfo: ExaminationInfo) => {
                 {
                     diseaseList.map(diseaseInfo => {
                         const {
-                            selectedDiseaseCode
+                            selectedDiseaseId
                         } = useModuleManagementService()
 
-                        const isItemSelected = selectedDiseaseCode === diseaseInfo.diseaseCode
+                        const isItemSelected = selectedDiseaseId === diseaseInfo.id
 
                         const diseaseSelectedStyle = clsx({
                             'text-[--theme-fore-color]': isItemSelected,

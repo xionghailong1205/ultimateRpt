@@ -38,4 +38,17 @@ export namespace BodyPartService {
             ...getRightBodyPartList()
         ])
     }
+
+    export const getBodyPartInfoOfSelectInputValue = (valueOfSelectInput: string) => {
+        let result = LeftBodyPartMap.get(valueOfSelectInput)
+        if (result) {
+            return result
+        }
+        result = RightBodyPartMap.get(valueOfSelectInput)
+        if (result) {
+            return result
+        }
+
+        return undefined
+    }
 }

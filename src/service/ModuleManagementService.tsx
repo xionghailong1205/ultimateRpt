@@ -1,3 +1,4 @@
+import { DiseaseManagement } from "@/api/DiseaseManagement";
 import { ExaminationInfo, ExaminationManagement } from "@/api/ExaminationManagement";
 import { handleAuthenticationFailure } from "@/api/utils/handleAuthenticationFailure";
 import { ReactFormExtendedApi, useForm } from "@tanstack/react-form";
@@ -9,9 +10,9 @@ type EditorBoxStatus = "nothing" | "editingExamination" | "editingDisease" | "vi
 
 interface ModuleManagementServiceContextProp {
     selectedItemId: number | undefined;
-    selectedDiseaseCode: string | undefined;
+    selectedDiseaseId: number | undefined;
     examinationItemList: Array<ExaminationInfo>;
-    initExaminationItemList: Function;
+    fetchExaminationItemList: Function;
     examinationItemListStatus: ExaminationItemListStatus;
     editorBoxStatus: EditorBoxStatus;
     changeEditorBoxStatus: (newStatus: EditorBoxStatus) => void;
@@ -23,6 +24,8 @@ interface ModuleManagementServiceContextProp {
     viewDiseaseInfo: (itemCode: string) => void
     // TODO
     examinationInfoOfEditorBox: ExaminationInfoOfEditorBox
+    handleEditExaminationInfoSuccessfully: () => void;
+    diseaseInfoOfEditorBox: DiseaseInfoOfEditorBox
 }
 
 const ExaminationServiceContext = createContext<ModuleManagementServiceContextProp>(null!)
@@ -30,7 +33,7 @@ const ExaminationServiceContext = createContext<ModuleManagementServiceContextPr
 export interface ExaminationInfoOfEditorBox {
     itemCode: string,
     itemName: string,
-    bodyPart: string,
+    bodyParts: string,
     defaultValue: string
 }
 
@@ -48,20 +51,31 @@ export const ModuleManagementServiceProvider = ({
 }: {
     children: ReactNode
 }) => {
+    // 我们在这里创建一个空的疾病详情数据
+    const emptyDiseaseInfoOfEditorBox: DiseaseInfoOfEditorBox = {
+        diseaseCode: "",
+        name: "",
+        sort: 0,
+        description: ""
+    }
+
     const [examinationItemList, setExaminationItemList] = useState<Array<ExaminationInfo>>([])
     const [examinationItemListStatus, setExaminationItemListStatus] = useState<ExaminationItemListStatus>("querying")
     const [editorBoxStatus, setEditorBoxStatus] = useState<EditorBoxStatus>("nothing")
     const [selectedItemId, setSelectedItemId] = useState<number | undefined>(undefined)
-    const [selectedDiseaseCode, setSelectedDiseaseCode] = useState<string | undefined>(undefined)
+    const [selectedDiseaseId, setSelectedDiseaseId] = useState<number | undefined>(undefined)
+    const [diseaseInfoOfEditorBox, setDiseaseInfoOfEditorBox] = useState<DiseaseInfoOfEditorBox>(emptyDiseaseInfoOfEditorBox)
 
     const getExaminationInfoOfEditorBox = () => {
         if (!selectedItemId) {
-            return ({
-                itemName: "",
+            const emptyExaminationInfoOfEditorBox: ExaminationInfoOfEditorBox = {
                 itemCode: "",
+                itemName: "",
                 defaultValue: "",
-                bodyPart: ""
-            })
+                bodyParts: "",
+            }
+
+            return (emptyExaminationInfoOfEditorBox)
         }
 
         let examinationInfo = examinationItemList.find(examinationInfo => {
@@ -72,50 +86,15 @@ export const ModuleManagementServiceProvider = ({
             itemName: examinationInfo.itemName,
             itemCode: examinationInfo.itemCode,
             defaultValue: examinationInfo.defaultValue || "",
-            bodyPart: examinationInfo.bodyPart?.[0] || ""
+            bodyParts: examinationInfo.bodyParts?.[0] || ""
         }
 
         return examinationInfoOfEditorBox
-
-        // formForExaminationItem.setFieldValue("itemName", examinationInfoOfEditorBox.itemName)
-        // formForExaminationItem.setFieldValue("itemCode", examinationInfoOfEditorBox.itemCode)
-        // formForExaminationItem.setFieldValue("defaultValue", examinationInfoOfEditorBox.defaultValue)
-        // formForExaminationItem.setFieldValue("bodyPart", examinationInfoOfEditorBox.bodyPart)
     }
 
     const examinationInfoOfEditorBox = getExaminationInfoOfEditorBox()
 
-    // useEffect(() => {
-    //     getEaminationInfoOfEditorBox()
-    // }, [selectedItemId])
-
-    const getDiseaseInfoOfEditorBox = () => {
-        let diseaseInfoOfEditorBox: DiseaseInfoOfEditorBox = {
-            diseaseCode: "",
-            name: "",
-            sort: 0,
-            description: ""
-        }
-
-        if (!selectedItemId) {
-            return diseaseInfoOfEditorBox
-        }
-
-        let diseaseInfo = examinationItemList.find(examinationInfo => {
-            return examinationInfo.itemCode === selectedItemId
-        })!
-
-        diseaseInfoOfEditorBox = {
-            diseaseCode: "",
-            name: "",
-            sort: 0,
-            description: ""
-        }
-    }
-
-    // const examinationInfoOfEditorBox = getEaminationInfoOfEditorBox()
-
-    const initExaminationItemList = async () => {
+    const fetchExaminationItemList = async () => {
         const requestResult = await ExaminationManagement.RetrieveExaminationList()
 
         const responseCode = requestResult.code
@@ -138,7 +117,7 @@ export const ModuleManagementServiceProvider = ({
 
     const viewExaminationItemInfo = (itemId: number) => {
         setSelectedItemId(itemId)
-        setSelectedDiseaseCode(undefined)
+        setSelectedDiseaseId(undefined)
         changeEditorBoxStatus("viewingExamination")
     }
 
@@ -146,10 +125,27 @@ export const ModuleManagementServiceProvider = ({
         setEditorBoxStatus("editingExamination")
     }
 
-    const viewDiseaseInfo = (diseaseCode: string) => {
-        setSelectedItemId(undefined)
-        setSelectedDiseaseCode(diseaseCode)
-        setEditorBoxStatus("viewingDisease")
+    const viewDiseaseInfo = async (diseaseCode: string) => {
+        const reqRst = await DiseaseManagement.getDiseaseInfoByDiseaseCode(diseaseCode)
+
+        const resCode = reqRst.code
+
+        handleAuthenticationFailure(resCode)
+
+        if (resCode === 200) {
+            const diseaseInfo = reqRst.data
+
+            setSelectedItemId(undefined)
+            setSelectedDiseaseId(diseaseInfo.id)
+            const diseaseInfoOfEditorBox: DiseaseInfoOfEditorBox = {
+                diseaseCode: diseaseInfo.diseaseCode,
+                name: diseaseInfo.name,
+                sort: diseaseInfo.sort,
+                description: diseaseInfo.description
+            }
+            setDiseaseInfoOfEditorBox(diseaseInfoOfEditorBox)
+            setEditorBoxStatus("viewingDisease")
+        }
     }
 
     const isViewing = () => {
@@ -160,10 +156,17 @@ export const ModuleManagementServiceProvider = ({
         return false
     }
 
+    const handleEditExaminationInfoSuccessfully = () => {
+        // 首先重新获取数据
+        fetchExaminationItemList()
+        // 然后进入查看状态
+        viewExaminationItemInfo(selectedItemId!)
+    }
+
     const value: ModuleManagementServiceContextProp = {
         selectedItemId: selectedItemId,
         examinationItemList,
-        initExaminationItemList,
+        fetchExaminationItemList,
         examinationItemListStatus,
         editorBoxStatus,
         changeEditorBoxStatus,
@@ -172,8 +175,11 @@ export const ModuleManagementServiceProvider = ({
         editExaminationItemInfo,
         isViewing,
         viewDiseaseInfo,
-        selectedDiseaseCode,
-        examinationInfoOfEditorBox
+        selectedDiseaseId,
+        handleEditExaminationInfoSuccessfully,
+        // 用来渲染 表单的 数据
+        examinationInfoOfEditorBox,
+        diseaseInfoOfEditorBox
     }
 
     return (

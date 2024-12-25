@@ -14,7 +14,8 @@ export const AlertDialogGlobal = () => {
 
     const {
         dialogTitle,
-        dialogDescription
+        dialogContent: dialogDescription,
+        dialogClosedCallback
     } = useAlertDialog(state => state.dialogContent)
 
     const closeDialog = useAlertDialog(state => state.closeDialog)
@@ -44,6 +45,9 @@ export const AlertDialogGlobal = () => {
                     <AlertDialogCancel
                         className="text-white bg-[--theme-fore-color] hover:bg-[--theme-fore-color-hover] hover:text-white h-[30px] text-[12px]"
                         onClick={() => {
+                            if (dialogClosedCallback) {
+                                dialogClosedCallback()
+                            }
                             closeDialog()
                         }}
                     >

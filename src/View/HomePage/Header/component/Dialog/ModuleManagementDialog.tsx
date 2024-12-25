@@ -8,14 +8,15 @@ import { PlusIcon } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import CollapsibleExaminationItem from "./component/CollapsibleExaminationItem"
 import ButtonInTable from "@/components/StyledComponent/ButtonInTable"
-import { DiseaseInfoKey } from "@/api/DiseaseManagement"
+import { DiseaseInfoOfEditorBox, DiseaseInfoOfEditorBoxKey } from "@/api/DiseaseManagement"
 import { Key2LabelService } from "@/map/key2LabelService"
 import { TableInputCol, TableSchema } from "@/service/TableService/TableService"
 import { FieldValidContext, FieldValidContextProp } from "@/service/FieldValidService"
-import clsx from "clsx"
 import { BodyPartService } from "@/service/BodyPartService"
 import { VerificationHelper } from "@/service/VerificationHelper"
 import { useForm } from "@tanstack/react-form"
+import { handleAuthenticationFailure } from "@/api/utils/handleAuthenticationFailure"
+import { useAlertDialog } from "@/store/useAlertDialog"
 // import { InputType, TableSchema, TableSchemaService } from "@/service/TableService/EntryPatientTableService"
 
 const ModuleManagementDialog = () => {
@@ -34,7 +35,7 @@ const ModuleManagementDialog = () => {
 const ExaminationItemList = ({ ...prop }: DivProp) => {
     const {
         examinationItemList,
-        initExaminationItemList,
+        fetchExaminationItemList: initExaminationItemList,
         examinationItemListStatus,
     } = useModuleManagementService()
 
@@ -157,7 +158,9 @@ const ExaminationItemTable = () => {
         examinationInfoOfEditorBox,
         isViewing,
         editExaminationItemInfo,
-        editorBoxStatus
+        editorBoxStatus,
+        selectedItemId,
+        handleEditExaminationInfoSuccessfully
     } = useModuleManagementService()
 
     const getLabel = Key2LabelService.getLabel
@@ -184,7 +187,7 @@ const ExaminationItemTable = () => {
             validFnc: makeSureNotEmpty
         },
         {
-            key: "bodyPart",
+            key: "bodyParts",
             label: getLabel("bodyPart"),
             type: "selector",
             selectInputProp: {
@@ -198,7 +201,26 @@ const ExaminationItemTable = () => {
     const form = useForm<ExaminationInfoOfEditorBox, undefined>({
         defaultValues: examinationInfoOfEditorBox,
         onSubmit: async ({ value }) => {
-            alert("执行更改操作")
+            const reqRst = await ExaminationManagement.EditExaminationItem({
+                id: selectedItemId!,
+                itemCode: value.itemCode,
+                itemName: value.itemName,
+                defaultValue: value.defaultValue,
+                bodyParts: [value.bodyParts]
+            })
+
+            const responseCode = reqRst.code
+
+            handleAuthenticationFailure(responseCode)
+
+            if (responseCode === 200) {
+                const openDialog = useAlertDialog.getState().openDialog;
+                openDialog({
+                    dialogTitle: "编辑检查项目",
+                    dialogContent: "编辑检查项目成功！",
+                    dialogClosedCallback: handleEditExaminationInfoSuccessfully
+                });
+            }
         }
     })
 
@@ -236,8 +258,6 @@ const ExaminationItemTable = () => {
                                                 return undefined
                                             }
 
-                                            console.log(tableSchema.validFnc(value))
-
                                             return tableSchema.validFnc(value)
                                         }
                                     }}
@@ -246,17 +266,24 @@ const ExaminationItemTable = () => {
 
                                         console.log(inValid)
 
+                                        let fieldValue = field.state.value
+                                        let type = tableSchema.type
+
+                                        if (isViewing()) {
+                                            if (tableSchema.type === "selector") {
+                                                fieldValue = BodyPartService.getBodyPartInfoOfSelectInputValue(fieldValue)?.labelName || ""
+                                            }
+
+                                            type = "readOnly"
+                                        }
+
                                         const value: FieldValidContextProp = {
                                             handleChange: (value: string) => {
                                                 field.handleChange(value)
                                             },
                                             handleBlur: field.handleBlur,
-                                            fieldValue: field.state.value,
+                                            fieldValue,
                                             inValid
-                                        }
-
-                                        if (isViewing()) {
-                                            tableSchema.type = "readOnly"
                                         }
 
                                         return (
@@ -264,7 +291,10 @@ const ExaminationItemTable = () => {
                                                 value={value}
                                             >
                                                 <TableInputCol
-                                                    tableSchema={tableSchema}
+                                                    tableSchema={{
+                                                        ...tableSchema,
+                                                        type
+                                                    }}
                                                 />
                                             </FieldValidContext.Provider>
                                         )
@@ -310,7 +340,7 @@ const ExaminationItemTable = () => {
 const DiseaseTable = () => {
     const getLabel = Key2LabelService.getLabel
 
-    const tableSchemaList: Array<TableSchema<DiseaseInfoKey>> = [
+    const tableSchemaList: Array<TableSchema<DiseaseInfoOfEditorBoxKey>> = [
         {
             key: "diseaseCode",
             label: getLabel("diseaseCode"),
@@ -333,6 +363,39 @@ const DiseaseTable = () => {
         }
     ]
 
+    const {
+        diseaseInfoOfEditorBox,
+        isViewing
+    } = useModuleManagementService()
+
+    const form = useForm<DiseaseInfoOfEditorBox, undefined>({
+        defaultValues: diseaseInfoOfEditorBox,
+        onSubmit: async ({ value }) => {
+            // const reqRst = await ExaminationManagement.EditExaminationItem({
+            //     id: selectedItemId!,
+            //     itemCode: value.itemCode,
+            //     itemName: value.itemName,
+            //     defaultValue: value.defaultValue,
+            //     bodyParts: [value.bodyParts]
+            // })
+
+            // const responseCode = reqRst.code
+
+            // handleAuthenticationFailure(responseCode)
+
+            // if (responseCode === 200) {
+            //     const openDialog = useAlertDialog.getState().openDialog;
+            //     openDialog({
+            //         dialogTitle: "编辑检查项目",
+            //         dialogContent: "编辑检查项目成功！",
+            //         dialogClosedCallback: handleEditExaminationInfoSuccessfully
+            //     });
+            // }
+            console.log(value)
+            alert("我们之后做后续的操作！")
+        }
+    })
+
     return (
         <div
             className="editor-box w-full h-full px-3 border"
@@ -351,11 +414,57 @@ const DiseaseTable = () => {
                     {
                         tableSchemaList.map(tableSchema => {
                             return (
-                                <TableInputCol
-                                    tableSchema={tableSchema}
-                                    value="123"
-                                // @ts-ignore
-                                // value={examinationInfoOfEditorBox[tableSchema.key]}
+                                <form.Field
+                                    name={tableSchema.key}
+                                    validators={{
+                                        onChange: ({ value }) => {
+                                            console.log(value)
+
+                                            if (!tableSchema.validFnc) {
+                                                return undefined
+                                            }
+
+                                            return tableSchema.validFnc(value)
+                                        }
+                                    }}
+                                    children={(field) => {
+                                        const inValid = field.state.meta.errors.length > 0
+
+                                        console.log(inValid)
+
+                                        let fieldValue = field.state.value
+                                        let type = tableSchema.type
+
+                                        if (isViewing()) {
+                                            if (tableSchema.type === "selector") {
+                                                fieldValue = BodyPartService.getBodyPartInfoOfSelectInputValue(fieldValue)?.labelName || ""
+                                            }
+
+                                            type = "readOnly"
+                                        }
+
+                                        const value: FieldValidContextProp = {
+                                            handleChange: (value: string) => {
+                                                field.handleChange(value)
+                                            },
+                                            handleBlur: field.handleBlur,
+                                            fieldValue,
+                                            inValid
+                                        }
+
+                                        return (
+                                            <FieldValidContext.Provider
+                                                value={value}
+                                            >
+                                                <TableInputCol
+                                                    tableSchema={{
+                                                        ...tableSchema,
+                                                        type
+                                                    }}
+                                                />
+                                            </FieldValidContext.Provider>
+                                        )
+                                    }}
                                 />
                             )
                         })

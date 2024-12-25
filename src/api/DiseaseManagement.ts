@@ -13,13 +13,23 @@ export interface DiseaseInfo {
 
 export type DiseaseInfoKey = keyof DiseaseInfo;
 
+export interface DiseaseInfoOfEditorBox {
+  diseaseCode: string;
+  name: string;
+  sort: number;
+  description: string;
+}
+
+export type DiseaseInfoOfEditorBoxKey = keyof DiseaseInfoOfEditorBox;
+
 interface FetchResult<T> {
   code: number;
   msg: string;
-  data: Array<T>;
+  data: T;
 }
 
-interface GetDiseaseListOfExaminationRst extends FetchResult<DiseaseInfo> {}
+interface GetDiseaseListOfExaminationRst
+  extends FetchResult<Array<DiseaseInfo>> {}
 
 export namespace DiseaseManagement {
   export const getDiseaseListOfExamination = async (
@@ -38,5 +48,20 @@ export namespace DiseaseManagement {
       (await response.json()) as GetDiseaseListOfExaminationRst;
 
     return requestResult;
+  };
+
+  export const getDiseaseInfoByDiseaseCode = async (diseaseCode: string) => {
+    let headersList = {
+      Accept: "*/*",
+    };
+
+    let response = await fetch(`${baseURL}/disease/${diseaseCode}`, {
+      method: "POST",
+      headers: headersList,
+    });
+
+    let reqRst = (await response.json()) as FetchResult<DiseaseInfo>;
+
+    return reqRst;
   };
 }
