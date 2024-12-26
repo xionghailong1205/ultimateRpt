@@ -5,6 +5,11 @@ export interface BodyPartBoxProp {
     label: string
 }
 
+export interface BodyPartImg {
+    key: string
+    src: string
+}
+
 export namespace BodyPartService {
     export const getLeftBodyPartList = (): Array<BodyPartBoxProp> => {
         const bodyPartList: Array<BodyPartBoxProp> = []
@@ -37,5 +42,25 @@ export namespace BodyPartService {
             ...getLeftBodyPartList(),
             ...getRightBodyPartList()
         ])
+    }
+
+    export const getBodyImgList = (): Array<BodyPartImg> => {
+        const bodyPartImgList: Array<BodyPartImg> = []
+
+        for (const [key, value] of RightBodyPartMap) {
+            bodyPartImgList.push({
+                key: key,
+                src: value.imgName
+            })
+        }
+
+        for (const [key, value] of LeftBodyPartMap) {
+            bodyPartImgList.push({
+                key: key,
+                src: value.imgName
+            })
+        }
+
+        return bodyPartImgList
     }
 }

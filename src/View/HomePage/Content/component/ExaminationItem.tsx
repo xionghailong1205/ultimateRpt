@@ -42,7 +42,7 @@ export const ExaminationItem = ({
                                     } */}
                                     {/* 用来开展示效果 */}
                                     {
-                                        `${index}、${examRst.itemName}`
+                                        `${index + 1}、${examRst.itemName}`
                                     }
                                 </div>
                             )

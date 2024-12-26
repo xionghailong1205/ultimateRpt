@@ -76,10 +76,11 @@ export function SelectInput({
                     setOpen(false)
                 }}
                 onPointerDownOutside={() => {
+                    handleBlur(fieldValue)
                     setOpen(false)
                 }}
-                // @ts-ignore
-                onBlur={handleBlur}
+            // @ts-ignore
+            // onBlur={handleBlur}
             >
                 <SelectGroup>
                     {

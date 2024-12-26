@@ -31,7 +31,7 @@
     --radius: 0.5rem;
     --content-box-width: 210px;
     --box-radius: 10px;
-    --bodypart-box-height: 650px;
+    --bodypart-box-minheight: 650px;
     /* 配合 tailwind 用的 css 变量 */
     --table-row-height: 40px;
     /* 主题前景色 */
@@ -44,9 +44,7 @@
     --history-result-height: 190px;
     /* 全局字体大小 */
     --global-font-size: 12px;
-    --examination-item-height: calc(
-      100% - var(--personal-info-height) - var(--history-result-height)
-    );
+    --examination-item-height: calc(100% - var(--personal-info-height) - var(--history-result-height));
     --table-input-height: 30px;
   }
 
@@ -183,4 +181,8 @@ input:-webkit-autofill {
   font-size: 12px;
   height: 25px;
   border-radius: 2px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none;
 }

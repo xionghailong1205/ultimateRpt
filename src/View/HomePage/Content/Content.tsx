@@ -29,7 +29,7 @@ const Content = () => {
                     style={{
                         flex: 1,
                         minWidth: "800px",
-                        minHeight: "650px",
+                        minHeight: "var(--bodypart-box-minheight)",
                     }}
                 />
                 <RightContent />

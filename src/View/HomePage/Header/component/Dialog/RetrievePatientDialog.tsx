@@ -1,19 +1,15 @@
 import { ReactNode } from "react"
 import { DivProp } from "@/View/type"
 import { RetrievePatientProvider, useRetrievePatientService } from "@/service/RetrievePatientService"
-import { CustomInput, CustomInputCell } from "./component/CustomInput"
-import CalendarUsedInDialog from "./component/CalendarUsedInDialog"
 import Pagination from "./component/Pagination"
 import { ResultTable } from "./component/ResultTable"
-import { Button } from "@/components/ui/button"
 import { DialogWrapper } from "./BaseDialogWrapper"
 import ButtonInTable from "@/components/StyledComponent/ButtonInTable"
 import { TableInputCol, TableSchema } from "@/service/TableService/TableService"
 import { KeyForPatientRetrieve } from "@/api/PatientService"
 import { Key2LabelService } from "@/map/key2LabelService"
-import { VerificationHelper } from "@/service/VerificationHelper"
-import clsx from "clsx"
 import { FieldValidContext, FieldValidContextProp } from "@/service/FieldValidService"
+import { VerificationHelper } from "@/service/VerificationHelper"
 
 const RetrievePatientDialog = () => {
     return (
@@ -86,6 +82,7 @@ const QueryForm = () => {
             key: "bhkDate",
             label: getLabel("bhkDate"),
             type: "input",
+            inputType: "date"
         },
         {
             key: "crptName",
@@ -150,8 +147,16 @@ const QueryForm = () => {
                     }
                 </div>
                 <div
-                    className="h-[--box-footer-height] flex justify-end items-center pt-3"
+                    className="h-[--box-footer-height] flex justify-end items-center pt-3 gap-2"
                 >
+                    <ButtonInTable
+                        type="button"
+                        onClick={() => {
+                            form.reset()
+                        }}
+                    >
+                        重置查询参数
+                    </ButtonInTable>
                     <form.Subscribe
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (

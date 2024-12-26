@@ -1,6 +1,9 @@
 import config from "./config";
+import QueryString from "qs";
 
 const baseURL = config.apiBaseUrl;
+
+export type PatientSex = "男" | "女";
 
 export interface PatientInfo {
   id: number;
@@ -8,7 +11,7 @@ export interface PatientInfo {
   bhkCode: string;
   institutionCode: string;
   crptName: string;
-  sex: string;
+  sex: PatientSex;
   idc: string;
   brth: string;
   age: string;
@@ -29,6 +32,7 @@ export type PatientInfoKey = keyof PatientInfo;
 interface PropOfFetchPatientListOfPage {
   pageNumber: number;
   pageSize: number;
+  queryObject: QueryObject;
 }
 
 interface FetchPatientListOfPageResult {
@@ -64,7 +68,7 @@ interface FetchPatientInfoByBHKCodeResult {
   data: PatinetInfoWithExaminationResult;
 }
 
-export interface OptionalPropForRetrievePatientList {
+export interface QueryObject {
   personName: string;
   bhkCode: string;
   sex: string;
@@ -74,19 +78,24 @@ export interface OptionalPropForRetrievePatientList {
   crptName: string;
 }
 
-export type KeyForPatientRetrieve = keyof OptionalPropForRetrievePatientList;
+export type KeyForPatientRetrieve = keyof QueryObject;
 
 export namespace PatientService {
   export const getPatientListOfPage = async ({
     pageNumber,
     pageSize,
+    queryObject,
   }: PropOfFetchPatientListOfPage): Promise<FetchPatientListOfPageResult> => {
     let headersList = {
       Accept: "*/*",
     };
 
+    const queryString = QueryString.stringify(queryObject);
+
+    console.log(queryString);
+
     let response = await fetch(
-      `${baseURL}/exam/person/page?pageSize=${pageSize}&pageNum=${pageNumber}`,
+      `${baseURL}/exam/person/page?pageSize=${pageSize}&pageNum=${pageNumber}&${queryString}`,
       {
         method: "GET",
         headers: headersList,

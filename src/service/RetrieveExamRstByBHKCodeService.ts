@@ -1,7 +1,11 @@
-import { PatientService } from "@/api/PatientService";
+import {
+  PatientService,
+  PatinetInfoWithExaminationResult,
+} from "@/api/PatientService";
 import { handleAuthenticationFailure } from "@/api/utils/handleAuthenticationFailure";
 import { useAlertDialog } from "@/store/useAlertDialog";
 import { usePatientInfoPage } from "@/store/usePatientInfoPage";
+import { BodyPartCanvasService } from "./BodyPartCanvasService/BodyPartCanvasService";
 
 export namespace RetrieveExamRstByBHKCode {
   export const retrieveExamPatientInfo = async (bhkCode: string) => {
@@ -9,9 +13,6 @@ export namespace RetrieveExamRstByBHKCode {
     const changePatientPageStatus =
       usePatientInfoPage.getState().changePatientPageStatus;
     changePatientPageStatus("querying");
-
-    const updatePatientInfoAfterQuery =
-      usePatientInfoPage.getState().updatePatientInfoAfterQuery;
 
     const requestResult = await PatientService.getPatientInfoByBHKCode(bhkCode);
 
@@ -23,7 +24,7 @@ export namespace RetrieveExamRstByBHKCode {
 
     if (requestResult.code === 200) {
       const patientInfoFromBE = requestResult.data;
-      updatePatientInfoAfterQuery(patientInfoFromBE);
+      callbackAfterQury(patientInfoFromBE);
     }
 
     changePatientPageStatus("afterQuerying");
@@ -35,5 +36,17 @@ export namespace RetrieveExamRstByBHKCode {
       dialogTitle: "查询检查结果失败",
       dialogDescription: errMsg,
     });
+  };
+
+  // 请求之后会执行的函数
+  const callbackAfterQury = (
+    patientInfoFromBE: PatinetInfoWithExaminationResult
+  ) => {
+    const updatePatientInfoAfterQuery =
+      usePatientInfoPage.getState().updatePatientInfoAfterQuery;
+
+    updatePatientInfoAfterQuery(patientInfoFromBE);
+
+    BodyPartCanvasService.initBodyPartCanvas(patientInfoFromBE.sex);
   };
 }

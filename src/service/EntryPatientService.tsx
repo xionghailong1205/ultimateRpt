@@ -2,7 +2,7 @@ import { DateRange } from "react-day-picker"
 import { createContext, ReactNode, useContext, useState } from "react";
 import { ReactFormExtendedApi, useForm } from "@tanstack/react-form";
 import { formatISO } from "date-fns";
-import { EntryPatient, PatientInfo, PropForPatientEntry } from "@/api/EntryPatient";
+import { EntryPatient, PatientInfo, EntryPatientManuallyObject } from "@/api/EntryPatient";
 import { ResultTableState } from "@/View/HomePage/Header/component/Dialog/component/ResultTable";
 import { handleAuthenticationFailure } from "@/api/utils/handleAuthenticationFailure";
 
@@ -24,7 +24,7 @@ interface EntryPatientServiceProp extends TableProp<PatientTableRowDataProp> {
     form: ReactFormExtendedApi<{
         dateRange: DateRangeOfQuery;
     }, undefined>;
-    formForEntryPatient: ReactFormExtendedApi<PropForPatientEntry, undefined>
+    formForEntryPatient: ReactFormExtendedApi<EntryPatientManuallyObject, undefined>
 }
 
 interface PatientTableRowDataProp {
@@ -112,21 +112,45 @@ export const EntryPatientProvider = ({
         }
     })
 
-    const formForEntryPatient = useForm<PropForPatientEntry, undefined>({
-        defaultValues: {
-            personName: "",
-            bhkCode: "",
-            bhkDate: "",
-            version: "v1"
+    const emptryEntryPatientManuallyObject: EntryPatientManuallyObject = {
+        personName: "",
+        bhkCode: "",
+        institutionCode: "",
+        crptName: "",
+        sex: "",
+        idc: "",
+        brth: "",
+        age: "",
+        isXrMd: "",
+        lnkTel: "",
+        wrkLnt: "",
+        wrkLntMonth: "",
+        tchBadRsnTim: "",
+        tchBadRsnMonth: "",
+        bhkDate: "",
+        version: "",
+        badRsn: ""
+    }
+
+    const formForEntryPatient = useForm<EntryPatientManuallyObject, undefined>({
+        defaultValues: emptryEntryPatientManuallyObject,
+        onSubmit: async ({ value }) => {
+            const reqRst = await EntryPatient.EntryPatientManually({
+                entryPatientManuallyObject: value
+            })
+
+            const resCode = reqRst.code
+
+            handleAuthenticationFailure(resCode)
+
+            if (resCode === 200) {
+                alert("录入成功")
+            }
         },
         defaultState: {
-            canSubmit: false,
+            canSubmit: false
         },
-        onSubmit: async ({ value }) => {
-            alert("之后执行逻辑")
-        }
     })
-
 
     const value = {
         resultTableState,

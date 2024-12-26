@@ -8,6 +8,7 @@ interface NormalInputProp extends InputProp {
 }
 
 export const NormalInput = ({
+    ...prop
 }: NormalInputProp) => {
     const {
         handleChange,
@@ -27,6 +28,7 @@ export const NormalInput = ({
                 handleChange(e.target.value)
             }}
             // @ts-ignore
+            type={prop.type}
             onBlur={handleBlur}
             placeholder="请输入..."
             style={{

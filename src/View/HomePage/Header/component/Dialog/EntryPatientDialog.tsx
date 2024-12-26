@@ -3,7 +3,7 @@ import { DateRangeOfQuery, EntryPatientProvider, useEntryPatientService } from "
 import clsx from "clsx"
 import { Button } from "@/components/ui/button"
 import { DivProp } from "@/View/type"
-import { ReactNode } from "react"
+import { ReactNode, useState } from "react"
 import { CustomInputCell } from "./component/CustomInput"
 import { ResultTable } from "./component/ResultTable"
 import Pagination from "./component/Pagination"
@@ -16,16 +16,18 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 import { Key2LabelService } from "@/map/key2LabelService"
-import { TableInputCol, TableSchema } from "@/service/TableService/EntryPatientTableService"
-import { KeyForPatientEntry } from "@/api/EntryPatient"
+import { TableInputCol, TableSchema } from "@/service/TableService/TableService"
+import { EntryPatient, EntryPatientManuallyObject, KeyForPatientEntry } from "@/api/EntryPatient"
 import ButtonInTable from "@/components/StyledComponent/ButtonInTable"
 import { VerificationHelper } from "@/service/VerificationHelper"
 import { FieldValidContext, FieldValidContextProp } from "@/service/FieldValidService"
+import { useForm } from "@tanstack/react-form"
+import { handleAuthenticationFailure } from "@/api/utils/handleAuthenticationFailure"
 
 const EntryPatientDialog = () => {
     return (
         <DialogWrapper
-            title="检索病人"
+            title="录入病人"
             tableComponent={
                 <EntryPatientProvider>
                     <EntryPatientTable />
@@ -116,9 +118,49 @@ const ApiEntryTable = () => {
 }
 
 const ManualEntryTable = () => {
-    const {
-        formForEntryPatient: form
-    } = useEntryPatientService()
+    const emptryEntryPatientManuallyObject: EntryPatientManuallyObject = {
+        personName: "",
+        bhkCode: "",
+        institutionCode: "",
+        crptName: "",
+        sex: "",
+        idc: "",
+        brth: "",
+        age: "",
+        isXrMd: "",
+        lnkTel: "",
+        wrkLnt: "",
+        wrkLntMonth: "",
+        tchBadRsnTim: "",
+        tchBadRsnMonth: "",
+        bhkDate: "",
+        version: "",
+        badRsn: ""
+    }
+
+    const form = useForm<EntryPatientManuallyObject, undefined>({
+        defaultValues: emptryEntryPatientManuallyObject,
+        onSubmit: async ({ value }) => {
+            console.log(value)
+
+            const reqRst = await EntryPatient.EntryPatientManually({
+                entryPatientManuallyObject: value
+            })
+
+            const resCode = reqRst.code
+
+            handleAuthenticationFailure(resCode)
+
+            if (resCode === 200) {
+                form.reset(emptryEntryPatientManuallyObject)
+            }
+
+            alert(`错误 ${resCode} : ${reqRst.msg}`)
+        },
+        defaultState: {
+            canSubmit: false
+        },
+    })
 
     const getLabel = Key2LabelService.getLabel
 
@@ -146,6 +188,7 @@ const ManualEntryTable = () => {
             key: "bhkDate",
             label: getLabel("bhkDate"),
             type: "input",
+            inputType: "date",
             validFnc: makeSureNotEmpty
         },
         {
@@ -180,7 +223,20 @@ const ManualEntryTable = () => {
         {
             key: "sex",
             label: getLabel("sex"),
-            type: "input",
+            type: "selector",
+            selectInputProp: {
+                placeHolder: "请选择性别...",
+                optionList: [
+                    {
+                        label: "男",
+                        value: "男"
+                    },
+                    {
+                        label: "女",
+                        value: "女"
+                    }
+                ]
+            }
         },
         {
             key: "idc",
@@ -191,6 +247,7 @@ const ManualEntryTable = () => {
             key: "brth",
             label: getLabel("brth"),
             type: "input",
+            inputType: "date"
         },
         {
             key: "age",

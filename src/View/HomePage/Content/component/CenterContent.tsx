@@ -1,8 +1,16 @@
-import { useEffect, useRef } from "react"
 import { DivProp } from "./type"
 import { BodyPartBoxProp, BodyPartService } from "@/service/BodyPartService"
+import { useBodyPartCanvas } from "@/service/BodyPartCanvasService/BodyPartCanvasStore"
+import { BodyPartCanvasService } from "@/service/BodyPartCanvasService/BodyPartCanvasService"
+import { useEffect } from "react"
 
 const CenterContent = ({ ...prop }: DivProp) => {
+    const bodyPartCanvaState = useBodyPartCanvas(state => state.bodyPartCanvaState)
+
+    useEffect(() => {
+        BodyPartCanvasService.initBodyPartCanvas()
+    })
+
     return (
         <div
             {...prop}
@@ -13,13 +21,25 @@ const CenterContent = ({ ...prop }: DivProp) => {
                 ...prop.style,
             }}
         >
-            <BodyPartList
-                bodyPartInfoList={BodyPartService.getRightBodyPartList()}
-            />
-            <BodyPartOverview />
-            <BodyPartList
-                bodyPartInfoList={BodyPartService.getLeftBodyPartList()}
-            />
+            {
+                bodyPartCanvaState === "afterQuerying" ? (
+                    <>
+                        <BodyPartList
+                            bodyPartInfoList={BodyPartService.getRightBodyPartList()}
+                        />
+                        <BodyPartOverview />
+                        <BodyPartList
+                            bodyPartInfoList={BodyPartService.getLeftBodyPartList()}
+                        />
+                    </>
+                ) : (
+                    <div
+                        className="w-full h-full center text-[16px] text-[--theme-fore-color]"
+                    >
+                        等待查询中...
+                    </div>
+                )
+            }
         </div>
     )
 }
@@ -60,28 +80,28 @@ const BodyPartList = ({
 
 const BodyPartOverview = ({ ...prop }: DivProp) => {
     // 创建 canvas 的 ref
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+    // const canvasRef = useRef<HTMLCanvasElement>(null);
 
     // 这个位置创建一个钩子
-    useEffect(() => {
-        const canvas = canvasRef.current
-        if (canvas) {
-            const ctx = canvas.getContext('2d')!
-            const humanBg = new Image();
-            humanBg.onload = function () {
-                ctx.drawImage(humanBg, 0, 0, 150, 450);
-            };
-            humanBg.src = "/background/man.png";
-        } else {
-            // 执行其他逻辑
-        }
-    }, [])
+    // useEffect(() => {
+    //     const canvas = canvasRef.current
+    //     if (canvas) {
+    //         const ctx = canvas.getContext('2d')!
+    //         const humanBg = new Image();
+    //         humanBg.onload = function () {
+    //             ctx.drawImage(humanBg, 0, 0, 150, 450);
+    //         };
+    //         humanBg.src = "/background/man.png";
+    //     } else {
+    //         // 执行其他逻辑
+    //     }
+    // }, [])
 
     return (
         <div
             {...prop}
             style={{
-                minWidth: "calc(var(--bodypart-box-height) * 0.3125)",
+                minWidth: "calc(var(--bodypart-box-minheight) * 0.3125)",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -90,13 +110,10 @@ const BodyPartOverview = ({ ...prop }: DivProp) => {
             }}
         >
             <canvas
-                ref={canvasRef}
-                style={{
-                    aspectRatio: 0.3125,
-                }}
+                id={BodyPartCanvasService.bodyPartCanvas}
+                width={BodyPartCanvasService.canvasWidth}
+                height={BodyPartCanvasService.canvasHeight}
                 className="h-full"
-                width="150px"
-                height="480px"
             >
 
             </canvas>

@@ -1,3 +1,4 @@
+import CalendarInput from "@/components/Inputer/CalendarInput";
 import NormalInput from "@/components/Inputer/NormalInput";
 import RstInput from "@/components/Inputer/RstInput";
 import { SelectInput, SelectInputProp } from "@/components/Inputer/SelectInput";
@@ -16,10 +17,10 @@ export interface TableSchema<T> {
 
 const getInputSpanInTable = (type: InputType): string => {
     switch (type) {
-        case "input": {
-            return "span 2";
-        }
-        case "selector": {
+        case "input":
+        case "selector":
+        case "dateInput":
+        case "readOnly": {
             return "span 2";
         }
         case "textarea": {
@@ -28,18 +29,15 @@ const getInputSpanInTable = (type: InputType): string => {
         case "subTitle": {
             return "1 / span 6"
         }
-        case "readOnly": {
-            return "span 2";
-        }
     }
 };
 
 const getInputHeight = (type: InputType): string => {
     switch (type) {
-        case "input": {
-            return "h-[--normal-input-height]";
-        }
-        case "selector": {
+        case "input":
+        case "selector":
+        case "readOnly":
+        case "dateInput": {
             return "h-[--normal-input-height]";
         }
         case "textarea": {
@@ -48,13 +46,10 @@ const getInputHeight = (type: InputType): string => {
         case "subTitle": {
             return "h-[--textare-input-height]";
         }
-        case "readOnly": {
-            return "h-[--normal-input-height]";
-        }
     }
 };
 
-type InputType = "input" | "selector" | "textarea" | "subTitle" | "readOnly";
+type InputType = "input" | "selector" | "textarea" | "subTitle" | "dateInput" | "readOnly";
 
 interface TableInputProp extends InputProp {
     type: InputType
@@ -93,6 +88,11 @@ export const TableInput = ({
                     optionList={selectInputProp.optionList}
                     placeHolder={selectInputProp.placeHolder}
                 />
+            )
+        }
+        case "dateInput": {
+            return (
+                <CalendarInput />
             )
         }
         case "readOnly": {
