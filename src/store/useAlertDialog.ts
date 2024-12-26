@@ -2,7 +2,8 @@ import { create } from "zustand";
 
 interface DialogContent {
   dialogTitle: string;
-  dialogDescription: string;
+  dialogContent: string;
+  dialogClosedCallback?: Function;
 }
 
 interface State {
@@ -20,8 +21,8 @@ interface useAlertDialogProp extends State, Action {}
 export const useAlertDialog = create<useAlertDialogProp>((set, get) => ({
   whetherOpen: false,
   dialogContent: {
-    dialogTitle: "default",
-    dialogDescription: "default",
+    dialogTitle: "",
+    dialogContent: "",
   },
   openDialog(dialogContent) {
     set({
@@ -40,7 +41,7 @@ export const useAlertDialog = create<useAlertDialogProp>((set, get) => ({
     setTimeout(() => {
       set({
         dialogContent: {
-          dialogDescription: "",
+          dialogContent: "",
           dialogTitle: "",
         },
       });

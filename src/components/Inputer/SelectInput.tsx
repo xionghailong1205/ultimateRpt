@@ -39,6 +39,8 @@ export function SelectInput({
         inValid
     } = useFieldValidService()
 
+    console.log(fieldValue)
+
     const className = clsx({
         'ring-1 ring-[#b91c1c]': inValid,
     })

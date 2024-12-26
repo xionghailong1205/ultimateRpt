@@ -34,7 +34,7 @@ export namespace RetrieveExamRstByBHKCode {
     const openDialog = useAlertDialog.getState().openDialog;
     openDialog({
       dialogTitle: "查询检查结果失败",
-      dialogDescription: errMsg,
+      dialogContent: errMsg,
     });
   };
 
